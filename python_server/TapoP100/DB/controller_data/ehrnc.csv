@@ -1,0 +1,3 @@
+ip,user_id,plug_name,on_state,rulebase,ruleset,sensornum
+192.168.0.118,ehrnc,test1,False,0,600,1
+192.168.0.115,ehrnc,test2,False,0,600,25
