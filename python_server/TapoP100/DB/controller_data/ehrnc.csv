@@ -1,3 +1,4 @@
-ip,user_id,plug_name,on_state,rulebase,ruleset,sensornum
-192.168.0.118,ehrnc,test1,False,0,600,1
-192.168.0.115,ehrnc,test2,False,0,600,25
+ip,user_id,plug_name,on_state,rulebase,ruleset,sensornum,type_agent
+221.151.78.120:80,ehrnc,공기순환기,False,0,1000,47,S
+221.151.78.120:81,ehrnc,공기청정기1,False,0,35,45,A
+221.151.78.120:82,ehrnc,공기청정기2,False,0,35,45,A

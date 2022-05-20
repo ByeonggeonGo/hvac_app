@@ -374,7 +374,7 @@ class P100():
 bp = Blueprint('main', __name__, url_prefix='/')
 @bp.route('/')
 def index():
-    return 'hi'
+	return 'hi'
 
 
 # @bp.route('/offline_train')
@@ -402,242 +402,259 @@ pw = 'qudrjs12#'
 
 # 스트링파라미터 유저이름까지 받아서 DB에서 스테이트까지 바뀌도록 수정할것
 def on_local(ip,user_id):
-    p_controller = P100(ip,email,pw)
-    p_controller.handshake()
-    p_controller.login()
-    p_controller.turnOn()
+	p_controller = P100(ip,email,pw)
+	p_controller.handshake()
+	p_controller.login()
+	p_controller.turnOn()
 
-    path = os.getcwd()
-    #상태변경
-    tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
-    tt.loc[tt.ip == ip,['on_state']] = True
-    tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
+	path = os.getcwd()
+	#상태변경
+	tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+	tt.loc[tt.ip == ip,['on_state']] = True
+	tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
 
-    #기록저장
-    time_now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    dd = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',))
-    history_sam = {
-        'time':time_now,
-        'ip':ip,
-        'state':'on',
-        }
-    
+	#기록저장
+	time_now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+	dd = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',))
+	history_sam = {
+		'time':time_now,
+		'ip':ip,
+		'state':'on',
+		}
+	
 
-    dd = dd.append(history_sam,ignore_index=True)
-    dd.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',),index = False)
+	dd = dd.append(history_sam,ignore_index=True)
+	dd.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',),index = False)
 
 
 
 # 스트링파라미터 유저이름까지 받아서 DB에서 스테이트까지 바뀌도록 수정할것
 
 def off_local(ip,user_id):
-    p_controller = P100(ip,email,pw)
-    p_controller.handshake()
-    p_controller.login()
-    p_controller.turnOff()
+	p_controller = P100(ip,email,pw)
+	p_controller.handshake()
+	p_controller.login()
+	p_controller.turnOff()
 
-    path = os.getcwd()
-    #기록저장
-    tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
-    tt.loc[tt.ip == ip,['on_state']] = False
-    tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
+	path = os.getcwd()
+	#기록저장
+	tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+	tt.loc[tt.ip == ip,['on_state']] = False
+	tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
 
-    #기록저장
-    time_now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    dd = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',))
-    history_sam = {
-        'time':time_now,
-        'ip':ip,
-        'state':'off',
-        }
-    
-    
-    dd = dd.append(history_sam,ignore_index=True)
-    dd.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',),index = False)
+	#기록저장
+	time_now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+	dd = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',))
+	history_sam = {
+		'time':time_now,
+		'ip':ip,
+		'state':'off',
+		}
+	
+	
+	dd = dd.append(history_sam,ignore_index=True)
+	dd.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',),index = False)
 
 
 
 
 @bp.route('/on')
 def on():
-    # http://192.168.0.108:9000/on?ip=192.168.0.115
-    ip = request.args.get('ip')
-    user_id = request.args.get('user_id')
-    on_local(ip,user_id)
-    return "controller_on"+" "+ip
+	# http://192.168.0.108:9000/on?ip=192.168.0.115
+	ip = request.args.get('ip')
+	user_id = request.args.get('user_id')
+	on_local(ip,user_id)
+	return "controller_on"+" "+ip
 
 @bp.route('/off')
 def off():
-    ip = request.args.get('ip')
-    user_id = request.args.get('user_id')
+	ip = request.args.get('ip')
+	user_id = request.args.get('user_id')
 
-    off_local(ip,user_id)
-    return 'controller_off'+" "+ip
+	off_local(ip,user_id)
+	return 'controller_off'+" "+ip
 
 @bp.route('/state')
 def state():
-    ip = request.args.get('ip')
+	ip = request.args.get('ip')
 
-    p_controller = P100(ip,email,pw)
-    p_controller.handshake()
-    p_controller.login()
-    
-    state = {}
-    state['on_time'] = p_controller.getDeviceInfo()['result']['on_time']
-    
-    if state['on_time'] == 0:
-        state['state'] = 'off'
-        return jsonify(state)
-    else:
-        state['state'] = 'on'
-        return jsonify(state)
+	p_controller = P100(ip,email,pw)
+	p_controller.handshake()
+	p_controller.login()
+	
+	state = {}
+	state['on_time'] = p_controller.getDeviceInfo()['result']['on_time']
+	
+	if state['on_time'] == 0:
+		state['state'] = 'off'
+		return jsonify(state)
+	else:
+		state['state'] = 'on'
+		return jsonify(state)
 
 @bp.route('/delay')
 def delay():
-    def generate():
-        for i in range(100):
-            time.sleep(0.5)
-            yield str(i)
-    return Response(stream_with_context(generate()))
+	def generate():
+		for i in range(100):
+			time.sleep(0.5)
+			yield str(i)
+	return Response(stream_with_context(generate()))
 
 #DB에 플러그 추가, ip중복은 없나 확인하고, 켜져있나 꺼져있나 확인하고 저장, 플러터에서 수정된 정보 ('/road_plug')다시 호출해서 리셋
 @bp.route('/add_plug')
 def add():
-    print('CHECK!!!')
-    ip = request.args.get('ip')
-    user_id = request.args.get('user_id')
-    plug_name = request.args.get('plug_name')
-    sensornum = request.args.get('sensornum')
+	print('CHECK!!!')
+	ip = request.args.get('ip')
+	user_id = request.args.get('user_id')
+	plug_name = request.args.get('plug_name')
+	sensornum = request.args.get('sensornum')
+	type_agent = request.args.get('type_agent')
+	ruleset = request.args.get('ruleset')
 
 
-    path = os.getcwd()
-    tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
-    
-    p_controller = P100(ip,email,pw)
-    p_controller.handshake()
-    p_controller.login()
+	path = os.getcwd()
+	tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+	
+	p_controller = P100(ip,email,pw)
+	p_controller.handshake()
+	p_controller.login()
 
-    if p_controller.getDeviceInfo()['result']['on_time'] == 0:
+	if p_controller.getDeviceInfo()['result']['on_time'] == 0:
 
-        on_state = False
-    else:
-        on_state = True
-    
-    plug = {
-        'ip':ip,
-        'user_id':user_id,
-        'plug_name':plug_name,
-        'on_state':on_state,
-        'rulebase':0,
-        'ruleset':1000,
-        'sensornum':sensornum,
-    }
+		on_state = False
+	else:
+		on_state = True
+	
+	plug = {
+		'ip':ip,
+		'user_id':user_id,
+		'plug_name':plug_name,
+		'on_state':on_state,
+		'rulebase':0,
+		'ruleset':ruleset,
+		'sensornum':sensornum,
+		'type_agent':type_agent,
+	}
+	print(plug)
 
-    if set(tt.ip) == set(tt.append(plug,ignore_index=True).ip):
-        return '중복'
-    else:
-        tt = tt.append(plug,ignore_index=True)
-        tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
-        return 'ok'
+	if set(tt.ip) == set(tt.append(plug,ignore_index=True).ip):
+		return '중복'
+	else:
+		tt = tt.append(plug,ignore_index=True)
+		tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
+		return 'ok'
 
 #DB에서 해당하는 플러그 지우고 다시 저장, 플러터에서 수정된 정보 ('/road_plug')다시 호출해서 리셋
 @bp.route('/remove_plug')
 def remove():
-    ip = request.args.get('ip')
-    user_id = request.args.get('user_id')
-    plug_name = request.args.get('plug_name')
+	ip = request.args.get('ip')
+	user_id = request.args.get('user_id')
+	plug_name = request.args.get('plug_name')
 
-    path = os.getcwd()
-    tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'))
-    tt.drop(tt[tt.ip == ip].index).to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
-    return 'ok'
+	path = os.getcwd()
+	tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'))
+	tt.drop(tt[tt.ip == ip].index).to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
+	return 'ok'
 
 
 #user_id에 맞는 파일 csv에서 찾아서 등록해놓은 플러그정보 반환(플러터 상에서는 이것 받아서 플러그 리스트컬럼 스테이트 리셋, 시작할때 한번 호출)
 @bp.route('/road_plug')
 def road():
-    
-    user_id = request.args.get('user_id')
-    path = os.getcwd()
-    tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'))
-    tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
-    
-    return tt.to_json()
+	
+	user_id = request.args.get('user_id')
+	path = os.getcwd()
+	tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'))
+	tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
+	
+	return tt.to_json()
 
 
 # 플러터에서 온오프할때 여기 데이터셋에서 스테이트 변경되도록하고 플러터에서 온오프할대 road_plug 재호출하도록 수정해야함(o)
 
 @bp.route('/rule_base_on')
 def rule_base_on():
-    # http://192.168.0.108:51213/rule_base_on?ip=192.168.0.118&user_id=ehrnc
-    ip = request.args.get('ip')
-    user_id = request.args.get('user_id')
-    sql="SELECT * FROM data WHERE 센서번호=01 AND 날짜 > now() - INTERVAL 5 MINUTE;"
+	# http://192.168.0.108:51213/rule_base_on?ip=192.168.0.118&user_id=ehrnc
+	ip = request.args.get('ip')
+	user_id = request.args.get('user_id')
+	def generate(ip,user_id):
+		path = os.getcwd()
+		tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+		tt.loc[tt.ip == ip,['rulebase']] = 1
+		type_agent = tt.loc[tt.ip == ip,['type_agent']].values
 
-    def generate(ip,user_id,sql):
-        path = os.getcwd()
-        tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
-        tt.loc[tt.ip == ip,['rulebase']] = 1
-        tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
-        rulestat = True
+		tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
+		rulestat = True
+		sensornum = tt.loc[tt.ip == ip,['sensornum']].values[0][0]
 
-        sensornum = tt.loc[tt.ip == ip,['sensornum']].values[0][0]
-        sql=f"SELECT * FROM data WHERE 센서번호={sensornum} AND 날짜 > now() - INTERVAL 5 MINUTE;"
-        while rulestat:
-            #
-            conn = pymysql.connect(
-            user='room_test',
-            passwd='ehrnc64581',
-            # 222.108.71.247 (외부접속)
-            # 192.168.0.42
-            host='222.108.71.247',
-            port=3306,
-            db='testdb',
-            )
-            
-            #
-            df=pd.read_sql_query(sql,conn)
-            conn.close()
-            
-            #
-            co2_val = float(df.loc[:,['CO2']].values[-1][0])
+		sql=f"SELECT * FROM sensor_{sensornum} WHERE 날짜 > now() - INTERVAL 10 MINUTE;"
+		# sql="SELECT * FROM sensor_44 WHERE 날짜 > now() - INTERVAL 10 MINUTE;"
+		
+		while rulestat:
+			#
+			conn = pymysql.connect(
+					user='room_test',
+					passwd='ehrnc64581',
+					#222.108.71.247(외부주소)
+					host='222.108.71.247',
+					#7656(외부포트)
+					port=7656,
+					db='sensor',
+					)
+			
+			#
+			df=pd.read_sql_query(sql,conn)
+			conn.close()
+			if df.empty:
+				tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+				tt.loc[tt.ip == ip,['rulebase']] = 0
+				tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
+				raise StopIteration
+				
+			# df.CO2.values[-1]
+			if type_agent == 'S' or type_agent == 'V':
+				env_val = float(df.CO2.values[-1])
+			else:
+				env_val = float(df.PM.values[-1])
 
-            #현재 운영 상태
-            path = os.getcwd()
-            tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
-            stat = tt.loc[tt.ip == ip,['on_state']].values[0]
-            co2_set_val = tt.loc[tt.ip == ip,['ruleset']].values[0]
-            if tt.loc[tt.ip == ip,['rulebase']].values[0] == 0:
-                rulestat = False
-            else: rulestat = True
+			#현재 운영 상태
+			path = os.getcwd()
+			tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+			stat = tt.loc[tt.ip == ip,['on_state']].values[0]
+			set_val = tt.loc[tt.ip == ip,['ruleset']].values[0]
+			if tt.loc[tt.ip == ip,['rulebase']].values[0] == 0:
+				rulestat = False
+			else: rulestat = True
 
-            #조건부 온오프
-            if co2_val > int(co2_set_val):
-                if stat: pass
-                else: on_local(ip,user_id)
-                
-            else:
-                if stat: off_local(ip,user_id)
-                else: pass
+			#조건부 온오프
+			if env_val > int(set_val):
+				if stat: pass
+				else: on_local(ip,user_id)
+				
+			else:
+				if stat: off_local(ip,user_id)
+				else: pass
 
-            yield str(co2_val)
-            time.sleep(10)
+			yield str(env_val)
+			time.sleep(10)
 
-    return Response(stream_with_context(generate(ip,user_id,sql)))
+	return Response(stream_with_context(generate(ip,user_id)))
 
 @bp.route('/rule_base_off')
 def rule_base_off():
-    # http://192.168.0.108:51213/rule_base_off?ip=192.168.0.118&user_id=ehrnc
+	# http://192.168.0.108:51213/rule_base_off?ip=192.168.0.118&user_id=ehrnc
 
-    ip = request.args.get('ip')
-    user_id = request.args.get('user_id')
+	ip = request.args.get('ip')
+	user_id = request.args.get('user_id')
 
-    path = os.getcwd()
-    tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
-    tt.loc[tt.ip == ip,['rulebase']] = 0
-    tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
+	path = os.getcwd()
+	tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+	tt.loc[tt.ip == ip,['rulebase']] = 0
+	tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
 
-    return 'ok'
+	return 'ok'
 
 
-##역할군 지정해서 co2, pm중 자동으로 할당되도록 설정, 플러터 추가할때 카테고리로 서큘레이터, 공기청정기, 환풍기 3가지
+## 역할군 지정해서 co2, pm중 자동으로 할당되도록 설정, 플러터 추가할때 카테고리로 서큘레이터, 환풍기, 공기청정기 3가지
+## rule base on에서 ip로 .csv 데이터베이스에서 조회후에 df에서 co2 또는 pm사용할지 서버 수정
+## 플러터에서는 agent type에 따라서 CO2 ppm으로 사용할지 pm2.5 ppm으로 사용할지 텍스트 스테이트 바뀌도록 수정
+## 에이전트 리스트에도 서큘레이터인지, 공기청정기인지 등 나올 수 있도록 수정하기

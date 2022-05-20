@@ -112,6 +112,8 @@ class Mainhome extends StatelessWidget {
                       String name_t = '';
                       String ip_t = '';
                       String sensornum_t = '';
+                      String typeagent_t = '';
+                      String ruleset_t = '';
                       Get.dialog(AlertDialog(
                         title: const Text('시스템 요소 추가'),
                         content: const Text('추가할 요소의 정보를 입력하세요.'),
@@ -140,12 +142,28 @@ class Mainhome extends StatelessWidget {
                               sensornum_t = value;
                             },
                           ),
+                          TextField(
+                            decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                hintText: 'S: 공기순환기, V: 환풍기, A: 공기청정기'),
+                            onChanged: (value) {
+                              typeagent_t = value;
+                            },
+                          ),
+                          TextField(
+                            decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                hintText: '자동감시 기준치 ex: 1000'),
+                            onChanged: (value) {
+                              ruleset_t = value;
+                            },
+                          ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               TextButton(
                                 onPressed: () {
-                                  plugcontroller.add_plug(user_id, ip_t, name_t,sensornum_t);
+                                  plugcontroller.add_plug(user_id, ip_t, name_t,sensornum_t,typeagent_t,ruleset_t);
                                   Get.back();
                                 },
                                 child: Text("추가"),
@@ -270,6 +288,24 @@ class Mainhome extends StatelessWidget {
                                               fontWeight: FontWeight.w600,
                                             ),
                                           ),
+                                          NeumorphicText(
+                                                  plugcontroller.pluglist.value[index].typeagent == 'S' ? '공기순환기' : plugcontroller.pluglist.value[index].typeagent == 'V' ? '환풍기' : '공기청정기',
+                                                  style: NeumorphicStyle(
+                                                    shape: NeumorphicShape.flat,
+                                                    boxShape:
+                                                        NeumorphicBoxShape.roundRect(
+                                                            BorderRadius.circular(12)),
+                                                    depth: 10,
+                                                    lightSource: LightSource.top,
+                                                    color:
+                                                        Color.fromARGB(146, 7, 7, 7),
+                                                    surfaceIntensity: 10,
+                                                  ),
+                                                  textStyle: NeumorphicTextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
                                         plugcontroller.pluglist.value[index]
                                                     .rulebasestate.value ==
                                                 1
@@ -295,7 +331,7 @@ class Mainhome extends StatelessWidget {
                                                   ),
                                                 ),
                                                 NeumorphicText(
-                                                  'CO2: ' + plugcontroller.pluglist.value[index].sensorval.value+' ppm',
+                                                  plugcontroller.pluglist.value[index].typeagent == 'A' ? 'PM2.5: ' + plugcontroller.pluglist.value[index].sensorval.value+' ppm' : 'CO2: ' + plugcontroller.pluglist.value[index].sensorval.value+' ppm',
                                                   style: NeumorphicStyle(
                                                     shape: NeumorphicShape.flat,
                                                     boxShape:
@@ -350,6 +386,7 @@ class Mainhome extends StatelessWidget {
                                                     fontWeight: FontWeight.w600,
                                                   ),
                                                 ),
+                                            
                                       ],
                                     ),
                                   ),
