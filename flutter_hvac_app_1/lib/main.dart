@@ -67,7 +67,6 @@ class Secondpage extends StatelessWidget {
           Text('Update......'),
           SizedBox(
             height: 400,
-            
           ),
         ],
       ),
@@ -156,7 +155,8 @@ class Mainhome extends StatelessWidget {
                           children: [
                             TextButton(
                               onPressed: () {
-                                plugcontroller.add_plug(user_id, ip_t, name_t,sensornum_t,typeagent_t,ruleset_t);
+                                plugcontroller.add_plug(user_id, ip_t, name_t,
+                                    sensornum_t, typeagent_t, ruleset_t);
                                 Get.back();
                               },
                               child: Text("추가"),
@@ -211,7 +211,10 @@ class Mainhome extends StatelessWidget {
                         depth: 7,
                         lightSource: LightSource.topLeft,
                         color: plugcontroller.pluglist.value[index]
-                                          .rulebasestate.value == 0 ?Color.fromARGB(146, 197, 199, 185) : Color.fromARGB(146, 148, 160, 82),
+                                    .rulebasestate.value ==
+                                0
+                            ? Color.fromARGB(146, 197, 199, 185)
+                            : Color.fromARGB(146, 148, 160, 82),
                         shadowDarkColor: Color.fromARGB(170, 0, 0, 0),
                         shadowLightColor: Color.fromARGB(255, 255, 255, 255),
                         surfaceIntensity: 10,
@@ -228,7 +231,8 @@ class Mainhome extends StatelessWidget {
                             child: Row(
                               children: [
                                 plugcontroller.pluglist.value[index].onoffstate
-                                            .value == true
+                                            .value ==
+                                        true
                                     ? IconButton(
                                         onPressed: () {
                                           var test = plugcontroller.pluglist();
@@ -248,7 +252,7 @@ class Mainhome extends StatelessWidget {
                                         color:
                                             Color.fromARGB(255, 172, 172, 172),
                                         iconSize: 40,
-                                      ), 
+                                      ),
                               ],
                             ),
                           ),
@@ -263,123 +267,162 @@ class Mainhome extends StatelessWidget {
                                         CrossAxisAlignment.stretch,
                                     children: [
                                       NeumorphicText(
-                                          plugcontroller
+                                        plugcontroller
                                             .pluglist.value[index].name,
-                                          style: NeumorphicStyle(
-                                            shape: NeumorphicShape.flat,
-                                            boxShape:
-                                                NeumorphicBoxShape.roundRect(
-                                                    BorderRadius.circular(12)),
-                                            depth: 10,
-                                            lightSource: LightSource.top,
-                                            color:
-                                                Color.fromARGB(146, 41, 41, 41),
-                                            surfaceIntensity: 10,
-                                          ),
-                                          textStyle: NeumorphicTextStyle(
-                                            fontSize: 25,
-                                            fontWeight: FontWeight.w600,
-                                          ),
+                                        style: NeumorphicStyle(
+                                          shape: NeumorphicShape.flat,
+                                          boxShape:
+                                              NeumorphicBoxShape.roundRect(
+                                                  BorderRadius.circular(12)),
+                                          depth: 10,
+                                          lightSource: LightSource.top,
+                                          color:
+                                              Color.fromARGB(146, 41, 41, 41),
+                                          surfaceIntensity: 10,
                                         ),
-                                        NeumorphicText(
-                                                plugcontroller.pluglist.value[index].typeagent == 'S' ? '공기순환기' : plugcontroller.pluglist.value[index].typeagent == 'V' ? '환풍기' : '공기청정기',
-                                                style: NeumorphicStyle(
-                                                  shape: NeumorphicShape.flat,
-                                                  boxShape:
-                                                      NeumorphicBoxShape.roundRect(
-                                                          BorderRadius.circular(12)),
-                                                  depth: 10,
-                                                  lightSource: LightSource.top,
-                                                  color:
-                                                      Color.fromARGB(146, 7, 7, 7),
-                                                  surfaceIntensity: 10,
-                                                ),
-                                                textStyle: NeumorphicTextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
+                                        textStyle: NeumorphicTextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      NeumorphicText(
+                                        plugcontroller.pluglist.value[index]
+                                                    .typeagent ==
+                                                'S'
+                                            ? '공기순환기'
+                                            : plugcontroller
+                                                        .pluglist
+                                                        .value[index]
+                                                        .typeagent ==
+                                                    'V'
+                                                ? '환풍기'
+                                                : '공기청정기',
+                                        style: NeumorphicStyle(
+                                          shape: NeumorphicShape.flat,
+                                          boxShape:
+                                              NeumorphicBoxShape.roundRect(
+                                                  BorderRadius.circular(12)),
+                                          depth: 10,
+                                          lightSource: LightSource.top,
+                                          color: Color.fromARGB(146, 7, 7, 7),
+                                          surfaceIntensity: 10,
+                                        ),
+                                        textStyle: NeumorphicTextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
                                       plugcontroller.pluglist.value[index]
                                                   .rulebasestate.value ==
                                               1
                                           ? Column(
-                                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                                            children: [
-                                              NeumorphicText(
-                                                '자동감시' + '기준: '+plugcontroller.pluglist.value[index].ruleset.value.toString() +'ppm',
-                                                style: NeumorphicStyle(
-                                                  shape: NeumorphicShape.flat,
-                                                  boxShape:
-                                                      NeumorphicBoxShape.roundRect(
-                                                          BorderRadius.circular(12)),
-                                                  depth: 10,
-                                                  lightSource: LightSource.top,
-                                                  color:
-                                                      Color.fromARGB(146, 7, 7, 7),
-                                                  surfaceIntensity: 10,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.stretch,
+                                              children: [
+                                                NeumorphicText(
+                                                  '자동감시' +
+                                                      '기준: ' +
+                                                      plugcontroller
+                                                          .pluglist
+                                                          .value[index]
+                                                          .ruleset
+                                                          .value
+                                                          .toString() +
+                                                      'ppm',
+                                                  style: NeumorphicStyle(
+                                                    shape: NeumorphicShape.flat,
+                                                    boxShape: NeumorphicBoxShape
+                                                        .roundRect(BorderRadius
+                                                            .circular(12)),
+                                                    depth: 10,
+                                                    lightSource:
+                                                        LightSource.top,
+                                                    color: Color.fromARGB(
+                                                        146, 7, 7, 7),
+                                                    surfaceIntensity: 10,
+                                                  ),
+                                                  textStyle:
+                                                      NeumorphicTextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
                                                 ),
-                                                textStyle: NeumorphicTextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w600,
+                                                NeumorphicText(
+                                                  plugcontroller
+                                                              .pluglist
+                                                              .value[index]
+                                                              .typeagent ==
+                                                          'A'
+                                                      ? 'PM2.5: ' +
+                                                          plugcontroller
+                                                              .pluglist
+                                                              .value[index]
+                                                              .sensorval
+                                                              .value +
+                                                          ' ppm'
+                                                      : 'CO2: ' +
+                                                          plugcontroller
+                                                              .pluglist
+                                                              .value[index]
+                                                              .sensorval
+                                                              .value +
+                                                          ' ppm',
+                                                  style: NeumorphicStyle(
+                                                    shape: NeumorphicShape.flat,
+                                                    boxShape: NeumorphicBoxShape
+                                                        .roundRect(BorderRadius
+                                                            .circular(12)),
+                                                    depth: 10,
+                                                    lightSource:
+                                                        LightSource.top,
+                                                    color: Color.fromARGB(
+                                                        146, 7, 7, 7),
+                                                    surfaceIntensity: 10,
+                                                  ),
+                                                  textStyle:
+                                                      NeumorphicTextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
                                                 ),
-                                              ),
-                                              NeumorphicText(
-                                                plugcontroller.pluglist.value[index].typeagent == 'A' ? 'PM2.5: ' + plugcontroller.pluglist.value[index].sensorval.value+' ppm' : 'CO2: ' + plugcontroller.pluglist.value[index].sensorval.value+' ppm',
-                                                style: NeumorphicStyle(
-                                                  shape: NeumorphicShape.flat,
-                                                  boxShape:
-                                                      NeumorphicBoxShape.roundRect(
-                                                          BorderRadius.circular(12)),
-                                                  depth: 10,
-                                                  lightSource: LightSource.top,
-                                                  color:
-                                                      Color.fromARGB(146, 7, 7, 7),
-                                                  surfaceIntensity: 10,
-                                                ),
-                                                textStyle: NeumorphicTextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
-                                            ],
-                                          )
+                                              ],
+                                            )
                                           : NeumorphicText(
-                                                '수동감시모드',
-                                                style: NeumorphicStyle(
-                                                  shape: NeumorphicShape.flat,
-                                                  boxShape:
-                                                      NeumorphicBoxShape.roundRect(
-                                                          BorderRadius.circular(12)),
-                                                  depth: 10,
-                                                  lightSource: LightSource.top,
-                                                  color:
-                                                      Color.fromARGB(146, 7, 7, 7),
-                                                  surfaceIntensity: 10,
-                                                ),
-                                                textStyle: NeumorphicTextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
+                                              '수동감시모드',
+                                              style: NeumorphicStyle(
+                                                shape: NeumorphicShape.flat,
+                                                boxShape: NeumorphicBoxShape
+                                                    .roundRect(
+                                                        BorderRadius.circular(
+                                                            12)),
+                                                depth: 10,
+                                                lightSource: LightSource.top,
+                                                color: Color.fromARGB(
+                                                    146, 7, 7, 7),
+                                                surfaceIntensity: 10,
                                               ),
-                                          NeumorphicText(
-                                                plugcontroller.pluglist.value[index].ip,
-                                                style: NeumorphicStyle(
-                                                  shape: NeumorphicShape.flat,
-                                                  boxShape:
-                                                      NeumorphicBoxShape.roundRect(
-                                                          BorderRadius.circular(12)),
-                                                  depth: 10,
-                                                  lightSource: LightSource.top,
-                                                  color:
-                                                      Color.fromARGB(146, 7, 7, 7),
-                                                  surfaceIntensity: 10,
-                                                ),
-                                                textStyle: NeumorphicTextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
+                                              textStyle: NeumorphicTextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600,
                                               ),
-                                          
+                                            ),
+                                      NeumorphicText(
+                                        plugcontroller.pluglist.value[index].ip,
+                                        style: NeumorphicStyle(
+                                          shape: NeumorphicShape.flat,
+                                          boxShape:
+                                              NeumorphicBoxShape.roundRect(
+                                                  BorderRadius.circular(12)),
+                                          depth: 10,
+                                          lightSource: LightSource.top,
+                                          color: Color.fromARGB(146, 7, 7, 7),
+                                          surfaceIntensity: 10,
+                                        ),
+                                        textStyle: NeumorphicTextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -540,23 +583,21 @@ class Bottombox extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(3.0),
               child: NeumorphicText(
-                            'HOME',
-                            style: NeumorphicStyle(
-                              shape: NeumorphicShape.flat,
-                              boxShape:
-                                  NeumorphicBoxShape.roundRect(
-                                      BorderRadius.circular(12)),
-                              depth: 10,
-                              lightSource: LightSource.top,
-                              color:
-                                  Color.fromARGB(146, 7, 7, 7),
-                              surfaceIntensity: 10,
-                            ),
-                            textStyle: NeumorphicTextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                'HOME',
+                style: NeumorphicStyle(
+                  shape: NeumorphicShape.flat,
+                  boxShape:
+                      NeumorphicBoxShape.roundRect(BorderRadius.circular(12)),
+                  depth: 10,
+                  lightSource: LightSource.top,
+                  color: Color.fromARGB(146, 7, 7, 7),
+                  surfaceIntensity: 10,
+                ),
+                textStyle: NeumorphicTextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             )
           ],
         ),
@@ -572,23 +613,21 @@ class Bottombox extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(3.0),
               child: NeumorphicText(
-                            'SMART SYSTEM',
-                            style: NeumorphicStyle(
-                              shape: NeumorphicShape.flat,
-                              boxShape:
-                                  NeumorphicBoxShape.roundRect(
-                                      BorderRadius.circular(12)),
-                              depth: 10,
-                              lightSource: LightSource.top,
-                              color:
-                                  Color.fromARGB(146, 7, 7, 7),
-                              surfaceIntensity: 10,
-                            ),
-                            textStyle: NeumorphicTextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                'SMART SYSTEM',
+                style: NeumorphicStyle(
+                  shape: NeumorphicShape.flat,
+                  boxShape:
+                      NeumorphicBoxShape.roundRect(BorderRadius.circular(12)),
+                  depth: 10,
+                  lightSource: LightSource.top,
+                  color: Color.fromARGB(146, 7, 7, 7),
+                  surfaceIntensity: 10,
+                ),
+                textStyle: NeumorphicTextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             )
           ],
         ),
@@ -604,23 +643,21 @@ class Bottombox extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(3.0),
               child: NeumorphicText(
-                            'DATA',
-                            style: NeumorphicStyle(
-                              shape: NeumorphicShape.flat,
-                              boxShape:
-                                  NeumorphicBoxShape.roundRect(
-                                      BorderRadius.circular(12)),
-                              depth: 10,
-                              lightSource: LightSource.top,
-                              color:
-                                  Color.fromARGB(146, 7, 7, 7),
-                              surfaceIntensity: 10,
-                            ),
-                            textStyle: NeumorphicTextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                'DATA',
+                style: NeumorphicStyle(
+                  shape: NeumorphicShape.flat,
+                  boxShape:
+                      NeumorphicBoxShape.roundRect(BorderRadius.circular(12)),
+                  depth: 10,
+                  lightSource: LightSource.top,
+                  color: Color.fromARGB(146, 7, 7, 7),
+                  surfaceIntensity: 10,
+                ),
+                textStyle: NeumorphicTextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             )
           ],
         ),
