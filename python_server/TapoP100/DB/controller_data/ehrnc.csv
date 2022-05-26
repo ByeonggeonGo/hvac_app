@@ -1,4 +1,4 @@
 ip,user_id,plug_name,on_state,rulebase,ruleset,sensornum,type_agent
 221.151.78.120:80,ehrnc,공기순환기,False,0,1000,47,S
 221.151.78.120:81,ehrnc,공기청정기1,False,1,15,45,A
-221.151.78.120:82,ehrnc,환풍기1,False,1,1000,45,V
+221.151.78.120:82,ehrnc,환풍기1,False,1,1000,49,V

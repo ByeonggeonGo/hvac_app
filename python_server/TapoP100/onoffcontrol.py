@@ -718,3 +718,13 @@ def rule_base_off():
 ## rule base on에서 ip로 .csv 데이터베이스에서 조회후에 df에서 co2 또는 pm사용할지 서버 수정
 ## 플러터에서는 agent type에 따라서 CO2 ppm으로 사용할지 pm2.5 ppm으로 사용할지 텍스트 스테이트 바뀌도록 수정
 ## 에이전트 리스트에도 서큘레이터인지, 공기청정기인지 등 나올 수 있도록 수정하기
+
+@bp.route('/onoff_history')
+def onoff_history():
+	#"http://222.108.71.247:51213/onoff_history?user_id=ehrnc";
+
+	user_id = request.args.get('user_id')
+	path = os.getcwd()
+	history_df = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',))
+	dd = history_df.to_json()
+	return dd
