@@ -571,25 +571,22 @@ def road():
 
 # 플러터에서 온오프할때 여기 데이터셋에서 스테이트 변경되도록하고 플러터에서 온오프할대 road_plug 재호출하도록 수정해야함(o)
 
-@bp.route('/rule_base_on')
-def rule_base_on():
-	# http://192.168.0.108:51213/rule_base_on?ip=192.168.0.118&user_id=ehrnc
-	ip = request.args.get('ip')
-	user_id = request.args.get('user_id')
-	def generate(ip,user_id):
-		path = os.getcwd()
-		tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+def offline_rule_base_on(ip, user_id):
+	path = os.getcwd()
+	tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+	type_agent = tt.loc[tt.ip == ip,['type_agent']].values
+
+	sensornum = tt.loc[tt.ip == ip,['sensornum']].values[0][0]
+	sql=f"SELECT * FROM sensor_{sensornum} WHERE 날짜 > now() - INTERVAL 10 MINUTE;"
+
+	if tt.loc[tt.ip == ip,['rulebase']].values[0] == 1:
+		print('rulebase_이미 작동중')
+	elif tt.loc[tt.ip == ip,['rulebase']].values[0] == 0:
 		tt.loc[tt.ip == ip,['rulebase']] = 1
-		type_agent = tt.loc[tt.ip == ip,['type_agent']].values
-
 		tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
-		rulestat = True
-		sensornum = tt.loc[tt.ip == ip,['sensornum']].values[0][0]
 
-		sql=f"SELECT * FROM sensor_{sensornum} WHERE 날짜 > now() - INTERVAL 10 MINUTE;"
-		# sql="SELECT * FROM sensor_44 WHERE 날짜 > now() - INTERVAL 10 MINUTE;"
 		
-		while rulestat:
+		while True:
 			#
 			conn = pymysql.connect(
 					user='room_test',
@@ -600,7 +597,6 @@ def rule_base_on():
 					port=7656,
 					db='sensor',
 					)
-			
 			#
 			df=pd.read_sql_query(sql,conn)
 			conn.close()
@@ -622,8 +618,9 @@ def rule_base_on():
 			stat = tt.loc[tt.ip == ip,['on_state']].values[0]
 			set_val = tt.loc[tt.ip == ip,['ruleset']].values[0]
 			if tt.loc[tt.ip == ip,['rulebase']].values[0] == 0:
-				rulestat = False
-			else: rulestat = True
+				print('rulebase_작동중지')
+				break
+			else: pass
 
 			#조건부 온오프
 			if env_val > int(set_val):
@@ -633,6 +630,69 @@ def rule_base_on():
 			else:
 				if stat: off_local(ip,user_id)
 				else: pass
+			# print('작동중: ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+			#기록저장
+			time_now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+			history_sam = {
+				'time':time_now,
+				'ip':ip,
+				'state':'rulebase_on',
+				'val':env_val ,
+				}
+			
+			dd = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history_rulebase'+'.csv',))
+			dd = dd.append(history_sam,ignore_index=True)
+			dd.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history_rulebase'+'.csv',),index = False)
+			time.sleep(10)
+
+
+
+
+
+@bp.route('/rule_base_on')
+def rule_base_on():
+	# http://192.168.0.108:51213/rule_base_on?ip=192.168.0.118&user_id=ehrnc
+	ip = request.args.get('ip')
+	user_id = request.args.get('user_id')
+	offline_rule_base_on(ip, user_id)
+
+	def generate(ip,user_id):
+		path = os.getcwd()
+		tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+		# tt.loc[tt.ip == ip,['rulebase']] = 1
+		type_agent = tt.loc[tt.ip == ip,['type_agent']].values
+
+		# tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
+		rulestat = True
+		sensornum = tt.loc[tt.ip == ip,['sensornum']].values[0][0]
+		sql=f"SELECT * FROM sensor_{sensornum} WHERE 날짜 > now() - INTERVAL 10 MINUTE;"
+		# sql="SELECT * FROM sensor_44 WHERE 날짜 > now() - INTERVAL 10 MINUTE;"
+		
+		while rulestat:
+			#
+			conn = pymysql.connect(
+					user='room_test',
+					passwd='ehrnc64581',
+					#222.108.71.247(외부주소)
+					host='222.108.71.247',
+					#7656(외부포트)
+					port=7656,
+					db='sensor',
+					)
+			#
+			df=pd.read_sql_query(sql,conn)
+			conn.close()
+			if df.empty:
+				tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+				tt.loc[tt.ip == ip,['rulebase']] = 0
+				tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
+				raise StopIteration
+				
+			# df.CO2.values[-1]
+			if type_agent == 'S' or type_agent == 'V':
+				env_val = float(df.CO2.values[-1])
+			else:
+				env_val = float(df.PM.values[-1])
 
 			yield str(env_val)
 			time.sleep(10)
