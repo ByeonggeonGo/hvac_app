@@ -412,19 +412,20 @@ def on_local(ip,user_id):
 	tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
 	tt.loc[tt.ip == ip,['on_state']] = True
 	tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
-
+	name_plug = tt.loc[tt.ip == ip,['plug_name']].values[0][0]
 	#기록저장
 	time_now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-	dd = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',))
+	dd = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',),encoding='euc-kr')
 	history_sam = {
 		'time':time_now,
 		'ip':ip,
 		'state':'on',
+		'name': name_plug,
 		}
 	
 
 	dd = dd.append(history_sam,ignore_index=True)
-	dd.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',),index = False)
+	dd.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',),index = False,encoding='euc-kr')
 
 
 
@@ -441,19 +442,20 @@ def off_local(ip,user_id):
 	tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
 	tt.loc[tt.ip == ip,['on_state']] = False
 	tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
-
+	name_plug = tt.loc[tt.ip == ip,['plug_name']].values[0][0]
 	#기록저장
 	time_now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-	dd = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',))
+	dd = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',),encoding='euc-kr')
 	history_sam = {
 		'time':time_now,
 		'ip':ip,
 		'state':'off',
+		'name': name_plug,
 		}
 	
 	
 	dd = dd.append(history_sam,ignore_index=True)
-	dd.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',),index = False)
+	dd.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',),index = False,encoding='euc-kr')
 
 
 
@@ -577,73 +579,153 @@ def offline_rule_base_on(ip, user_id):
 	type_agent = tt.loc[tt.ip == ip,['type_agent']].values
 
 	sensornum = tt.loc[tt.ip == ip,['sensornum']].values[0][0]
-	sql=f"SELECT * FROM sensor_{sensornum} WHERE 날짜 > now() - INTERVAL 10 MINUTE;"
+	if sensornum != 0:
+		sql=f"SELECT * FROM sensor_{sensornum} WHERE 날짜 > now() - INTERVAL 10 MINUTE;"
 
-	if tt.loc[tt.ip == ip,['rulebase']].values[0] == 1:
-		print('rulebase_이미 작동중')
-	elif tt.loc[tt.ip == ip,['rulebase']].values[0] == 0:
-		tt.loc[tt.ip == ip,['rulebase']] = 1
-		tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
+		if tt.loc[tt.ip == ip,['rulebase']].values[0] == 1:
+			print('rulebase_이미 작동중')
+		elif tt.loc[tt.ip == ip,['rulebase']].values[0] == 0:
+			tt.loc[tt.ip == ip,['rulebase']] = 1
+			tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
+			while True:
+				#
+				conn = pymysql.connect(
+						user='room_test',
+						passwd='ehrnc64581',
+						#222.108.71.247(외부주소)
+						host='222.108.71.247',
+						#7656(외부포트)
+						port=7656,
+						db='sensor',
+						)
+				#
+				df=pd.read_sql_query(sql,conn)
+				conn.close()
+				if df.empty:
+					tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+					tt.loc[tt.ip == ip,['rulebase']] = 0
+					tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
+					raise StopIteration
+					
+				# df.CO2.values[-1]
+				if type_agent == 'S' or type_agent == 'V':
+					env_val = float(df.CO2.values[-1])
+				else:
+					env_val = float(df.PM.values[-1])
 
-		
-		while True:
-			#
-			conn = pymysql.connect(
-					user='room_test',
-					passwd='ehrnc64581',
-					#222.108.71.247(외부주소)
-					host='222.108.71.247',
-					#7656(외부포트)
-					port=7656,
-					db='sensor',
-					)
-			#
-			df=pd.read_sql_query(sql,conn)
-			conn.close()
-			if df.empty:
+				#현재 운영 상태
+				path = os.getcwd()
 				tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
-				tt.loc[tt.ip == ip,['rulebase']] = 0
-				tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
-				raise StopIteration
-				
-			# df.CO2.values[-1]
-			if type_agent == 'S' or type_agent == 'V':
-				env_val = float(df.CO2.values[-1])
-			else:
-				env_val = float(df.PM.values[-1])
-
-			#현재 운영 상태
-			path = os.getcwd()
-			tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
-			stat = tt.loc[tt.ip == ip,['on_state']].values[0]
-			set_val = tt.loc[tt.ip == ip,['ruleset']].values[0]
-			if tt.loc[tt.ip == ip,['rulebase']].values[0] == 0:
-				print('rulebase_작동중지')
-				break
-			else: pass
-
-			#조건부 온오프
-			if env_val > int(set_val):
-				if stat: pass
-				else: on_local(ip,user_id)
-				
-			else:
-				if stat: off_local(ip,user_id)
+				stat = tt.loc[tt.ip == ip,['on_state']].values[0]
+				set_val = tt.loc[tt.ip == ip,['ruleset']].values[0]
+				if tt.loc[tt.ip == ip,['rulebase']].values[0] == 0:
+					print('rulebase_작동중지')
+					break
 				else: pass
-			# print('작동중: ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-			#기록저장
-			time_now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-			history_sam = {
-				'time':time_now,
-				'ip':ip,
-				'state':'rulebase_on',
-				'val':env_val ,
-				}
-			
-			dd = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history_rulebase'+'.csv',))
-			dd = dd.append(history_sam,ignore_index=True)
-			dd.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history_rulebase'+'.csv',),index = False)
-			time.sleep(10)
+
+				#조건부 온오프
+				if env_val > int(set_val):
+					if stat: pass
+					else: on_local(ip,user_id)
+					
+				else:
+					if stat: off_local(ip,user_id)
+					else: pass
+				# print('작동중: ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+				#기록저장
+				time_now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+				history_sam = {
+					'time':time_now,
+					'ip':ip,
+					'state':'rulebase_on',
+					'val':env_val ,
+					}
+				
+				#dd = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history_rulebase'+'.csv',))
+				#dd = dd.append(history_sam,ignore_index=True)
+				#dd.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history_rulebase'+'.csv',),index = False)
+				print(history_sam)
+				# file same time error, make another file for save
+				time.sleep(10)
+	elif sensornum == 0 :
+		# sql=f"SELECT * FROM sensor_{sensornum} WHERE 날짜 > now() - INTERVAL 10 MINUTE;"
+		sensor_list = [45,46,47,48,49,50,51,53,]
+
+		if tt.loc[tt.ip == ip,['rulebase']].values[0] == 1:
+			print('rulebase_이미 작동중')
+		elif tt.loc[tt.ip == ip,['rulebase']].values[0] == 0:
+			tt.loc[tt.ip == ip,['rulebase']] = 1
+			tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
+			while True:
+				#
+				val_list = []
+				for i in sensor_list:
+					conn = pymysql.connect(
+							user='room_test',
+							passwd='ehrnc64581',
+							#222.108.71.247(외부주소)
+							host='222.108.71.247',
+							#7656(외부포트)
+							port=7656,
+							db='sensor',
+							)
+					#
+					sql=f"SELECT * FROM sensor_{i} WHERE 날짜 > now() - INTERVAL 10 MINUTE;"
+					df=pd.read_sql_query(sql,conn)
+					conn.close()
+					
+					if df.empty:
+						
+						tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+						tt.loc[tt.ip == ip,['rulebase']] = 0
+						tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
+						raise StopIteration
+						
+					# df.CO2.values[-1]
+					if type_agent == 'S' or type_agent == 'V':
+						env_val = float(df.CO2.values[-1])
+					else:
+						env_val = float(df.PM.values[-1])
+					val_list.append(env_val)
+		
+				max_val = max(val_list)
+				
+
+				#현재 운영 상태
+				path = os.getcwd()
+				tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+				stat = tt.loc[tt.ip == ip,['on_state']].values[0]
+				set_val = tt.loc[tt.ip == ip,['ruleset']].values[0]
+				if tt.loc[tt.ip == ip,['rulebase']].values[0] == 0:
+					print('rulebase_작동중지')
+					break
+				else: pass
+
+				#조건부 온오프
+				if max_val > int(set_val):
+					if stat: pass
+					else: on_local(ip,user_id)
+					
+				else:
+					if stat: off_local(ip,user_id)
+					else: pass
+				# print('작동중: ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+				#기록저장
+				time_now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+				history_sam = {
+					'time':time_now,
+					'ip':ip,
+					'state':'rulebase_on',
+					'val':max_val ,
+					}
+				
+				#dd = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history_rulebase'+'.csv',))
+				#dd = dd.append(history_sam,ignore_index=True)
+				#dd.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history_rulebase'+'.csv',),index = False)
+				print(history_sam)
+				# file same time error, make another file for save
+				time.sleep(10)
+
 
 
 
@@ -665,38 +747,73 @@ def rule_base_on():
 		# tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
 		rulestat = True
 		sensornum = tt.loc[tt.ip == ip,['sensornum']].values[0][0]
-		sql=f"SELECT * FROM sensor_{sensornum} WHERE 날짜 > now() - INTERVAL 10 MINUTE;"
-		# sql="SELECT * FROM sensor_44 WHERE 날짜 > now() - INTERVAL 10 MINUTE;"
-		
-		while rulestat:
-			#
-			conn = pymysql.connect(
-					user='room_test',
-					passwd='ehrnc64581',
-					#222.108.71.247(외부주소)
-					host='222.108.71.247',
-					#7656(외부포트)
-					port=7656,
-					db='sensor',
-					)
-			#
-			df=pd.read_sql_query(sql,conn)
-			conn.close()
-			if df.empty:
-				tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
-				tt.loc[tt.ip == ip,['rulebase']] = 0
-				tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
-				raise StopIteration
-				
-			# df.CO2.values[-1]
-			if type_agent == 'S' or type_agent == 'V':
-				env_val = float(df.CO2.values[-1])
-			else:
-				env_val = float(df.PM.values[-1])
+		if sensornum != 0 :
+			sql=f"SELECT * FROM sensor_{sensornum} WHERE 날짜 > now() - INTERVAL 10 MINUTE;"
+			# sql="SELECT * FROM sensor_44 WHERE 날짜 > now() - INTERVAL 10 MINUTE;"
+			
+			while rulestat:
+				#
+				conn = pymysql.connect(
+						user='room_test',
+						passwd='ehrnc64581',
+						#222.108.71.247(외부주소)
+						host='222.108.71.247',
+						#7656(외부포트)
+						port=7656,
+						db='sensor',
+						)
+				#
+				df=pd.read_sql_query(sql,conn)
+				conn.close()
+				if df.empty:
+					tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+					tt.loc[tt.ip == ip,['rulebase']] = 0
+					tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
+					raise StopIteration
+					
+				# df.CO2.values[-1]
+				if type_agent == 'S' or type_agent == 'V':
+					env_val = float(df.CO2.values[-1])
+				else:
+					env_val = float(df.PM.values[-1])
 
-			yield str(env_val)
-			time.sleep(10)
+				yield str(env_val)
+				time.sleep(10)
+		else:
+			sensor_list = [45,46,47,48,49,50,51,53,]
 
+			while rulestat:
+				#
+				val_list = []
+				for i in sensor_list:
+					sql=f"SELECT * FROM sensor_{i} WHERE 날짜 > now() - INTERVAL 10 MINUTE;"
+					conn = pymysql.connect(
+							user='room_test',
+							passwd='ehrnc64581',
+							#222.108.71.247(외부주소)
+							host='222.108.71.247',
+							#7656(외부포트)
+							port=7656,
+							db='sensor',
+							)
+					#
+					df=pd.read_sql_query(sql,conn)
+					conn.close()
+					if df.empty:
+						tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+						tt.loc[tt.ip == ip,['rulebase']] = 0
+						tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
+						raise StopIteration
+						
+					# df.CO2.values[-1]
+					if type_agent == 'S' or type_agent == 'V':
+						env_val = float(df.CO2.values[-1])
+					else:
+						env_val = float(df.PM.values[-1])
+					val_list.append(env_val)
+				max_val = max(val_list)
+				yield str(max_val)
+				time.sleep(10)
 	return Response(stream_with_context(generate(ip,user_id)))
 
 @bp.route('/rule_base_off')
@@ -725,6 +842,56 @@ def onoff_history():
 
 	user_id = request.args.get('user_id')
 	path = os.getcwd()
-	history_df = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',))
+	history_df = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',),encoding='euc-kr')
 	dd = history_df.to_json()
 	return dd
+
+
+
+# pm, co2, 온도 등 전체 방 평균으로 보내주기, 하루정도? or 기간도 스트링파라미터로 받기
+# 플러터 앱 시작할때 data안들어가더라도 데이터 미리 받고있기. 빨리볼 수 있도록
+# 그후 30번정도 신규데이터 넣어주기?(고려)
+
+@bp.route('/mean_data')
+def mean_data():
+	#"http://222.108.71.247:51213/mean_data";
+
+	# user_id = request.args.get('user_id')
+	sensor_list = ['44','45','46','47','48','49',]
+	# sensor_list = ['44','45']
+	data_list = []
+	for i in sensor_list:
+		conn = pymysql.connect(
+		user='room_test',
+		passwd='ehrnc64581',
+		#222.108.71.247(외부주소)
+		host='222.108.71.247',
+		#7656(외부포트)
+		port=7656,
+		db='sensor',
+		)
+
+		#
+		sql=f"SELECT * FROM sensor_{i} WHERE 날짜 > now() - INTERVAL 3 day;"
+
+		#
+		df=pd.read_sql_query(sql,conn)
+		conn.close()
+		# df['time_index'] = pd.to_datetime(df['날짜']).dt.floor('min')
+		df['co2'] = pd.to_numeric(df['CO2'])
+		df['pm'] = pd.to_numeric(df['PM'])
+		df['temp'] = pd.to_numeric(df['온도'])
+		df['hum'] = pd.to_numeric(df['습도'])
+		df = df.set_index('날짜').resample('1T',).mean()
+		df['sensor'] = i
+		
+
+		data_list.append(df)
+
+	data_concated = pd.concat(data_list,axis=0)
+	data_final = data_concated.groupby(['날짜'], as_index=True).mean()
+	data_final.index = data_final.index.strftime('%Y-%m-%d %H:%M:%S')
+	dd = data_final.to_json(orient = 'index')
+	return dd
+
+

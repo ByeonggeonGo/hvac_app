@@ -6,6 +6,8 @@ import 'dart:convert';
 class PlugController extends GetxController {
   var _pluglist = [].obs;
 
+  var dataset_index = 0.obs;
+  String sensor_dataset_Url = "http://222.108.71.247:51213/mean_data";
   RxList get pluglist => _pluglist;
   String pub_ip = '222.108.71.247:51213';
 
@@ -116,6 +118,15 @@ class PlugController extends GetxController {
           }
         }
       }
+    });
+  }
+
+  load_data() async {
+    await http.get(Uri.parse(sensor_dataset_Url),
+        headers: {"Access-Control_Allow_Origin": "*"}).then((Response) {
+      Response.statusCode == 200 ? dataset_index.value = 1 : null;
+      print('okokok');
+      print(jsonDecode(Response.body));
     });
   }
 }

@@ -3,13 +3,27 @@ import 'package:get/get.dart';
 import 'dart:convert';
 import 'Controllers.dart';
 import 'package:flutter_neumorphic_null_safety/flutter_neumorphic.dart';
+import 'package:http/http.dart' as http;
 
 final plugcontroller = PlugController();
 var page_index = 0.obs;
 var user_id = 'ehrnc';
+Map sensor_info = {
+  '0': '최댓값',
+  '44': '거실',
+  '45': '거실(청정기옆)',
+  '46': '안방',
+  '47': '안쪽방',
+  '48': '중간방',
+  '49': '서재(가장아래)',
+  '50': '서재(아래)',
+  '51': '서재(중간)',
+  '53': '서재(맨위)',
+};
 
 void main() async {
   plugcontroller.set_plug_list(user_id);
+  plugcontroller.load_data();
   runApp(GetMaterialApp(home: Home()));
 }
 
@@ -39,9 +53,7 @@ class Home_page extends StatelessWidget {
               ? Mainhome()
               : page_index == 1
                   ? Secondpage()
-                  : Container(
-                      child: Text('Update......'),
-                    ),
+                  : Datapage(),
           bottomNavigationBar: Container(
             height: 70,
             child: Bottombox(),
@@ -286,17 +298,12 @@ class Mainhome extends StatelessWidget {
                                         ),
                                       ),
                                       NeumorphicText(
-                                        plugcontroller.pluglist.value[index]
-                                                    .typeagent ==
-                                                'S'
-                                            ? '공기순환기'
-                                            : plugcontroller
-                                                        .pluglist
-                                                        .value[index]
-                                                        .typeagent ==
-                                                    'V'
-                                                ? '환풍기'
-                                                : '공기청정기',
+                                        sensor_info[plugcontroller.pluglist
+                                                .value[index].sensornum] +
+                                            '(' +
+                                            plugcontroller.pluglist.value[index]
+                                                .sensornum +
+                                            ')',
                                         style: NeumorphicStyle(
                                           shape: NeumorphicShape.flat,
                                           boxShape:
@@ -406,23 +413,6 @@ class Mainhome extends StatelessWidget {
                                                 fontWeight: FontWeight.w600,
                                               ),
                                             ),
-                                      NeumorphicText(
-                                        plugcontroller.pluglist.value[index].ip,
-                                        style: NeumorphicStyle(
-                                          shape: NeumorphicShape.flat,
-                                          boxShape:
-                                              NeumorphicBoxShape.roundRect(
-                                                  BorderRadius.circular(12)),
-                                          depth: 10,
-                                          lightSource: LightSource.top,
-                                          color: Color.fromARGB(146, 7, 7, 7),
-                                          surfaceIntensity: 10,
-                                        ),
-                                        textStyle: NeumorphicTextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
                                     ],
                                   ),
                                 ),
@@ -507,37 +497,198 @@ class Mainhome extends StatelessWidget {
                                             .pluglist.value[index].ip;
                                         var name_t = plugcontroller
                                             .pluglist.value[index].name;
+                                        var sensornum_t = plugcontroller
+                                            .pluglist.value[index].sensornum;
+                                        var typeagent_t = plugcontroller
+                                            .pluglist.value[index].typeagent;
+                                        var ruleset_t = plugcontroller.pluglist
+                                            .value[index].ruleset.value.toString();
+
+                                        // user_id, ip_t, name_t,sensornum_t, typeagent_t, ruleset_t
                                         // plugcontroller.remove_plug(
                                         //     user_id, ip_t, name_t);
                                         Get.dialog(AlertDialog(
-                                          title: const Text('삭제'),
-                                          content: const Text('삭제하시겠습니까?'),
+                                          title: const Text('정보'),
+                                          content:
+                                              const Text('수정하거나 기기를 삭제하세요.'),
                                           actions: [
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.end,
-                                              children: [
-                                                TextButton(
-                                                  onPressed: () {
-                                                    plugcontroller.remove_plug(
-                                                        user_id, ip_t, name_t);
-                                                    Get.back();
-                                                  },
-                                                  child: Text("확인"),
+                                            Container(
+                                              height: 300,
+                                              child: SingleChildScrollView(
+                                                child: Column(
+                                                  children: [
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.start,
+                                                      children: [
+                                                    Padding(
+                                                      padding: const EdgeInsets.all(2.0),
+                                                      child: Text('name'),
+                                                    ),
+                                                      ],
+                                                    ),
+                                                    SizedBox(
+                                                      height: 50,
+                                                      child: TextField(
+                                                        controller:
+                                                        TextEditingController()
+                                                          ..text = name_t,
+                                                        decoration: const InputDecoration(
+                                                        border: OutlineInputBorder(),
+                                                        hintText: 'Enter name'),
+                                                        onChanged: (value) {
+                                                      name_t = value;
+                                                        },
+                                                      ),
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.start,
+                                                      children: [
+                                                    Padding(
+                                                      padding: const EdgeInsets.all(2.0),
+                                                      child: Text('ip'),
+                                                    ),
+                                                      ],
+                                                    ),
+                                                    SizedBox(
+                                                      height: 50,
+                                                      child: TextField(
+                                                        controller:
+                                                        TextEditingController()
+                                                          ..text = ip_t,
+                                                        decoration: const InputDecoration(
+                                                        border: OutlineInputBorder(),
+                                                        hintText: 'Enter ip'),
+                                                        onChanged: (value) {
+                                                      ip_t = value;
+                                                        },
+                                                      ),
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.start,
+                                                      children: [
+                                                    Padding(
+                                                      padding: const EdgeInsets.all(2.0),
+                                                      child: Text('sensor number'),
+                                                    ),
+                                                      ],
+                                                    ),
+                                                    SizedBox(
+                                                      height: 50,
+                                                      child: TextField(
+                                                        controller:
+                                                        TextEditingController()
+                                                          ..text = sensornum_t,
+                                                        decoration: const InputDecoration(
+                                                        border: OutlineInputBorder(),
+                                                        hintText:
+                                                            'Enter sensor number'),
+                                                        onChanged: (value) {
+                                                      sensornum_t = value;
+                                                        },
+                                                      ),
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.start,
+                                                      children: [
+                                                    Padding(
+                                                      padding: const EdgeInsets.all(2.0),
+                                                      child: Text('type'),
+                                                    ),
+                                                      ],
+                                                    ),
+                                                    SizedBox(
+                                                      height: 50,
+                                                      child: TextField(
+                                                        controller:
+                                                        TextEditingController()
+                                                          ..text = typeagent_t,
+                                                        decoration: const InputDecoration(
+                                                        border: OutlineInputBorder(),
+                                                        hintText:
+                                                            'S: 공기순환기, V: 환풍기, A: 공기청정기'),
+                                                        onChanged: (value) {
+                                                      typeagent_t = value;
+                                                        },
+                                                      ),
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.start,
+                                                      children: [
+                                                    Padding(
+                                                      padding: const EdgeInsets.all(2.0),
+                                                      child: Text('monitoring levels'),
+                                                    ),
+                                                      ],
+                                                    ),
+                                                    SizedBox(
+                                                      height: 50,
+                                                      child: TextField(
+                                                        controller:
+                                                        TextEditingController()
+                                                          ..text =
+                                                              ruleset_t.toString(),
+                                                        decoration: const InputDecoration(
+                                                        border: OutlineInputBorder(),
+                                                        hintText:
+                                                            '자동감시 기준치 ex: 1000'),
+                                                        onChanged: (value) {
+                                                      ruleset_t = value;
+                                                        },
+                                                      ),
+                                                    ),
+                                                    
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment.end,
+                                                      children: [
+                                                        TextButton(
+                                                          onPressed: () {
+                                                            print(user_id is int);
+                                                            print(ip_t is int);
+                                                            print(name_t is int);
+                                                            print(sensornum_t is int);
+                                                            print(typeagent_t is int);
+                                                            print(ruleset_t is int);
+                                                  
+                                                  
+                                                            plugcontroller.remove_plug(
+                                                                user_id, ip_t, name_t);
+                                                            plugcontroller.add_plug(
+                                                                user_id,
+                                                                ip_t,
+                                                                name_t,
+                                                                sensornum_t,
+                                                                typeagent_t,
+                                                                ruleset_t);
+                                                            Get.back();
+                                                          },
+                                                          child: Text("수정"),
+                                                        ),
+                                                        TextButton(
+                                                          onPressed: () {
+                                                            plugcontroller.remove_plug(
+                                                                user_id, ip_t, name_t);
+                                                            Get.back();
+                                                          },
+                                                          child: Text("삭제"),
+                                                        ),
+                                                        TextButton(
+                                                          onPressed: () {
+                                                            Get.back();
+                                                          },
+                                                          child: Text("취소"),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
                                                 ),
-                                                TextButton(
-                                                  onPressed: () {
-                                                    Get.back();
-                                                  },
-                                                  child: Text("취소"),
-                                                ),
-                                              ],
+                                              ),
                                             ),
                                           ],
                                         ));
                                       },
                                       icon: Icon(
-                                        Icons.delete_outline,
+                                        Icons.info_outline,
                                       ),
                                       color: Colors.black,
                                     ),
@@ -555,6 +706,69 @@ class Mainhome extends StatelessWidget {
                   }).toList(),
                 )),
           )
+        ],
+      ),
+    );
+  }
+}
+
+class Datapage extends StatelessWidget {
+  const Datapage({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(
+            height: 70,
+          ),
+          Neumorphic(
+            // height: 70,
+            // color: Color.fromARGB(255, 255, 255, 255),
+            margin: EdgeInsets.all(10),
+            padding: EdgeInsets.all(4),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.add_box_outlined),
+                  onPressed: () {},
+                ),
+                NeumorphicText(
+                  'Monitoring System',
+                  style: NeumorphicStyle(
+                    shape: NeumorphicShape.flat,
+                    boxShape:
+                        NeumorphicBoxShape.roundRect(BorderRadius.circular(12)),
+                    depth: 10,
+                    lightSource: LightSource.topLeft,
+                    color: Color.fromARGB(146, 22, 22, 22),
+                    surfaceIntensity: 10,
+                  ),
+                  textStyle: NeumorphicTextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                IconButton(onPressed: () {}, icon: Icon(Icons.restart_alt)),
+              ],
+            ),
+          ),
+          Flexible(
+              fit: FlexFit.tight,
+              // plugcontroller.pluglist.value
+              child: Container(
+                color: Colors.red,
+                child: Obx((() => plugcontroller.dataset_index.value == 0
+                    ? Text('data loading...')
+                    : Text('complete'))),
+              ))
         ],
       ),
     );
@@ -608,7 +822,7 @@ class Bottombox extends StatelessWidget {
                   onPressed: () {
                     page_index.value = 1;
                   },
-                  icon: Icon(Icons.adb)),
+                  icon: Icon(Icons.schedule)),
             ),
             Padding(
               padding: const EdgeInsets.all(3.0),
