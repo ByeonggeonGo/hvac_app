@@ -38,6 +38,7 @@ dependencies:
   http: ^0.13.4
   search_choices: ^2.0.19
   flutter_neumorphic_null_safety: ^3.2.4
+  bezier_chart: ^1.0.17+1
 
 dev_dependencies:
   flutter_test:

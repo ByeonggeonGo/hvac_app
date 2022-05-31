@@ -4,6 +4,10 @@ import 'dart:convert';
 import 'Controllers.dart';
 import 'package:flutter_neumorphic_null_safety/flutter_neumorphic.dart';
 import 'package:http/http.dart' as http;
+import 'package:bezier_chart/bezier_chart.dart';
+import 'dart:io';
+
+
 
 final plugcontroller = PlugController();
 var page_index = 0.obs;
@@ -299,11 +303,17 @@ class Mainhome extends StatelessWidget {
                                       ),
                                       NeumorphicText(
                                         sensor_info[plugcontroller.pluglist
-                                                .value[index].sensornum] +
-                                            '(' +
-                                            plugcontroller.pluglist.value[index]
-                                                .sensornum +
-                                            ')',
+                                                    .value[index].sensornum] !=
+                                                null
+                                            ? sensor_info[plugcontroller
+                                                    .pluglist
+                                                    .value[index]
+                                                    .sensornum] +
+                                                '(' +
+                                                plugcontroller.pluglist
+                                                    .value[index].sensornum +
+                                                ')'
+                                            : '센서수정중',
                                         style: NeumorphicStyle(
                                           shape: NeumorphicShape.flat,
                                           boxShape:
@@ -425,11 +435,13 @@ class Mainhome extends StatelessWidget {
                                     onChanged: (value) {
                                       plugcontroller.pluglist.value[index]
                                           .rulebasestate.value = value;
-                                      value == 1
-                                          ? plugcontroller.pluglist.value[index]
-                                              .rule_base_on(user_id)
-                                          : plugcontroller.pluglist.value[index]
-                                              .rule_base_off(user_id);
+                                      value == 1 ?
+                                        plugcontroller.pluglist.value[index]
+                                            .rule_base_on(user_id):
+                                      
+                                        plugcontroller.pluglist.value[index]
+                                            .rule_base_off(user_id);
+                                      
                                       // plugcontroller.set_plug_list(user_id);
                                     },
                                     thumb: Neumorphic(),
@@ -501,8 +513,9 @@ class Mainhome extends StatelessWidget {
                                             .pluglist.value[index].sensornum;
                                         var typeagent_t = plugcontroller
                                             .pluglist.value[index].typeagent;
-                                        var ruleset_t = plugcontroller.pluglist
-                                            .value[index].ruleset.value.toString();
+                                        var ruleset_t = plugcontroller
+                                            .pluglist.value[index].ruleset.value
+                                            .toString();
 
                                         // user_id, ip_t, name_t,sensornum_t, typeagent_t, ruleset_t
                                         // plugcontroller.remove_plug(
@@ -518,156 +531,207 @@ class Mainhome extends StatelessWidget {
                                                 child: Column(
                                                   children: [
                                                     Row(
-                                                      mainAxisAlignment: MainAxisAlignment.start,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .start,
                                                       children: [
-                                                    Padding(
-                                                      padding: const EdgeInsets.all(2.0),
-                                                      child: Text('name'),
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(2.0),
+                                                          child: Text('name: '+ name_t),
+                                                        ),
+                                                      ],
                                                     ),
+                                                    // SizedBox(
+                                                    //   height: 50,
+                                                    //   child: TextField(
+                                                    //     controller:
+                                                    //         TextEditingController()
+                                                    //           ..text = name_t,
+                                                    //     decoration:
+                                                    //         const InputDecoration(
+                                                    //             border:
+                                                    //                 OutlineInputBorder(),
+                                                    //             hintText:
+                                                    //                 'Enter name'),
+                                                    //     onChanged: (value) {
+                                                    //       name_t = value;
+                                                    //     },
+                                                    //   ),
+                                                    // ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(2.0),
+                                                          child: Text('ip: '+ip_t),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    // SizedBox(
+                                                    //   height: 50,
+                                                    //   child: TextField(
+                                                    //     controller:
+                                                    //         TextEditingController()
+                                                    //           ..text = ip_t,
+                                                    //     decoration:
+                                                    //         const InputDecoration(
+                                                    //             border:
+                                                    //                 OutlineInputBorder(),
+                                                    //             hintText:
+                                                    //                 'Enter ip'),
+                                                    //     onChanged: (value) {
+                                                    //       ip_t = value;
+                                                    //     },
+                                                    //   ),
+                                                    // ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(2.0),
+                                                          child: Text(
+                                                              'sensor number'),
+                                                        ),
                                                       ],
                                                     ),
                                                     SizedBox(
                                                       height: 50,
                                                       child: TextField(
                                                         controller:
-                                                        TextEditingController()
-                                                          ..text = name_t,
+                                                            TextEditingController()
+                                                              ..text =
+                                                                  sensornum_t,
                                                         decoration: const InputDecoration(
-                                                        border: OutlineInputBorder(),
-                                                        hintText: 'Enter name'),
+                                                            border:
+                                                                OutlineInputBorder(),
+                                                            hintText:
+                                                                'Enter sensor number'),
                                                         onChanged: (value) {
-                                                      name_t = value;
+                                                          sensornum_t = value;
                                                         },
                                                       ),
                                                     ),
                                                     Row(
-                                                      mainAxisAlignment: MainAxisAlignment.start,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .start,
                                                       children: [
-                                                    Padding(
-                                                      padding: const EdgeInsets.all(2.0),
-                                                      child: Text('ip'),
-                                                    ),
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(2.0),
+                                                          child: Text('type'),
+                                                        ),
                                                       ],
                                                     ),
                                                     SizedBox(
                                                       height: 50,
                                                       child: TextField(
                                                         controller:
-                                                        TextEditingController()
-                                                          ..text = ip_t,
+                                                            TextEditingController()
+                                                              ..text =
+                                                                  typeagent_t,
                                                         decoration: const InputDecoration(
-                                                        border: OutlineInputBorder(),
-                                                        hintText: 'Enter ip'),
+                                                            border:
+                                                                OutlineInputBorder(),
+                                                            hintText:
+                                                                'S: 공기순환기, V: 환풍기, A: 공기청정기'),
                                                         onChanged: (value) {
-                                                      ip_t = value;
+                                                          typeagent_t = value;
                                                         },
                                                       ),
                                                     ),
                                                     Row(
-                                                      mainAxisAlignment: MainAxisAlignment.start,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .start,
                                                       children: [
-                                                    Padding(
-                                                      padding: const EdgeInsets.all(2.0),
-                                                      child: Text('sensor number'),
-                                                    ),
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(2.0),
+                                                          child: Text(
+                                                              'monitoring levels'),
+                                                        ),
                                                       ],
                                                     ),
                                                     SizedBox(
                                                       height: 50,
                                                       child: TextField(
                                                         controller:
-                                                        TextEditingController()
-                                                          ..text = sensornum_t,
+                                                            TextEditingController()
+                                                              ..text = ruleset_t
+                                                                  .toString(),
                                                         decoration: const InputDecoration(
-                                                        border: OutlineInputBorder(),
-                                                        hintText:
-                                                            'Enter sensor number'),
+                                                            border:
+                                                                OutlineInputBorder(),
+                                                            hintText:
+                                                                '자동감시 기준치 ex: 1000'),
                                                         onChanged: (value) {
-                                                      sensornum_t = value;
+                                                          ruleset_t = value;
                                                         },
                                                       ),
                                                     ),
-                                                    Row(
-                                                      mainAxisAlignment: MainAxisAlignment.start,
-                                                      children: [
-                                                    Padding(
-                                                      padding: const EdgeInsets.all(2.0),
-                                                      child: Text('type'),
-                                                    ),
-                                                      ],
-                                                    ),
-                                                    SizedBox(
-                                                      height: 50,
-                                                      child: TextField(
-                                                        controller:
-                                                        TextEditingController()
-                                                          ..text = typeagent_t,
-                                                        decoration: const InputDecoration(
-                                                        border: OutlineInputBorder(),
-                                                        hintText:
-                                                            'S: 공기순환기, V: 환풍기, A: 공기청정기'),
-                                                        onChanged: (value) {
-                                                      typeagent_t = value;
-                                                        },
-                                                      ),
-                                                    ),
-                                                    Row(
-                                                      mainAxisAlignment: MainAxisAlignment.start,
-                                                      children: [
-                                                    Padding(
-                                                      padding: const EdgeInsets.all(2.0),
-                                                      child: Text('monitoring levels'),
-                                                    ),
-                                                      ],
-                                                    ),
-                                                    SizedBox(
-                                                      height: 50,
-                                                      child: TextField(
-                                                        controller:
-                                                        TextEditingController()
-                                                          ..text =
-                                                              ruleset_t.toString(),
-                                                        decoration: const InputDecoration(
-                                                        border: OutlineInputBorder(),
-                                                        hintText:
-                                                            '자동감시 기준치 ex: 1000'),
-                                                        onChanged: (value) {
-                                                      ruleset_t = value;
-                                                        },
-                                                      ),
-                                                    ),
-                                                    
                                                     Row(
                                                       mainAxisAlignment:
                                                           MainAxisAlignment.end,
                                                       children: [
                                                         TextButton(
-                                                          onPressed: () {
-                                                            print(user_id is int);
-                                                            print(ip_t is int);
-                                                            print(name_t is int);
-                                                            print(sensornum_t is int);
-                                                            print(typeagent_t is int);
-                                                            print(ruleset_t is int);
-                                                  
-                                                  
-                                                            plugcontroller.remove_plug(
-                                                                user_id, ip_t, name_t);
-                                                            plugcontroller.add_plug(
-                                                                user_id,
-                                                                ip_t,
-                                                                name_t,
-                                                                sensornum_t,
-                                                                typeagent_t,
-                                                                ruleset_t);
-                                                            Get.back();
+                                                          onPressed: () async{
+                                                            if (sensor_info[
+                                                                    sensornum_t] !=
+                                                                null) {
+                                                              await plugcontroller
+                                                                  .remove_plug(
+                                                                      user_id,
+                                                                      ip_t,
+                                                                      name_t);
+                                                              sleep(Duration(seconds:1));
+                                                              await plugcontroller
+                                                                  .add_plug(
+                                                                      user_id,
+                                                                      ip_t,
+                                                                      name_t,
+                                                                      sensornum_t,
+                                                                      typeagent_t,
+                                                                      ruleset_t);
+                                                              sleep(Duration(seconds:1));
+                                                              plugcontroller
+                                                                  .set_plug_list(
+                                                                      user_id);
+                                                              Get.back();
+                                                            } else {
+                                                              Get.dialog(AlertDialog(
+                                                                  title:
+                                                                      const Text(
+                                                                          '경고'),
+                                                                  content: const Text('없는 센서 번호입니다.'),
+                                                                  actions: [
+                                                                    Text(sensor_info
+                                                                        .toString())
+                                                                  ]));
+                                                              Get.back();
+                                                            }
                                                           },
                                                           child: Text("수정"),
                                                         ),
                                                         TextButton(
                                                           onPressed: () {
-                                                            plugcontroller.remove_plug(
-                                                                user_id, ip_t, name_t);
+                                                            plugcontroller
+                                                                .remove_plug(
+                                                                    user_id,
+                                                                    ip_t,
+                                                                    name_t);
                                                             Get.back();
                                                           },
                                                           child: Text("삭제"),
@@ -763,11 +827,19 @@ class Datapage extends StatelessWidget {
           Flexible(
               fit: FlexFit.tight,
               // plugcontroller.pluglist.value
-              child: Container(
-                color: Colors.red,
-                child: Obx((() => plugcontroller.dataset_index.value == 0
-                    ? Text('data loading...')
-                    : Text('complete'))),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Column(
+                  children: [
+                    Chart(),
+                    Container(
+                      color: Colors.red,
+                      child: Obx((() => plugcontroller.sensor_data.value == 0
+                          ? Text('data loading...')
+                          : Text(plugcontroller.sensor_data.value.toString()))),
+                    ),
+                  ],
+                ),
               ))
         ],
       ),
@@ -876,6 +948,58 @@ class Bottombox extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+class Chart extends StatelessWidget {
+  const Chart({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final fromDate = DateTime(2019, 05, 22);
+    final toDate = DateTime.now();
+
+    final date1 = DateTime.now().subtract(Duration(days: 2));
+    final date2 = DateTime.now().subtract(Duration(days: 3));
+
+    return Center(
+      child: Container(
+        color: Colors.red,
+        height: MediaQuery.of(context).size.height / 2,
+        width: MediaQuery.of(context).size.width,
+        child: BezierChart(
+          fromDate: fromDate,
+          bezierChartScale: BezierChartScale.WEEKLY,
+          toDate: toDate,
+          selectedDate: toDate,
+          series: [
+            BezierLine(
+              label: "Duty",
+              onMissingValue: (dateTime) {
+                if (dateTime.day.isEven) {
+                  return 10.0;
+                }
+                return 5.0;
+              },
+              data: [
+                DataPoint<DateTime>(value: 10, xAxis: date1),
+                DataPoint<DateTime>(value: 50, xAxis: date2),
+              ],
+            ),
+          ],
+          config: BezierChartConfig(
+            verticalIndicatorStrokeWidth: 3.0,
+            verticalIndicatorColor: Colors.black26,
+            showVerticalIndicator: true,
+            verticalIndicatorFixedPosition: false,
+            backgroundColor: Colors.red,
+            footerHeight: 30.0,
+          ),
+        ),
+      ),
     );
   }
 }

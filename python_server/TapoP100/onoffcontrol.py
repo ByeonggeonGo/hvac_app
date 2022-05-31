@@ -540,10 +540,12 @@ def add():
 	print(plug)
 
 	if set(tt.ip) == set(tt.append(plug,ignore_index=True).ip):
+		print('중복')
 		return '중복'
 	else:
 		tt = tt.append(plug,ignore_index=True)
 		tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
+		print('플러그추가 성공')
 		return 'ok'
 
 #DB에서 해당하는 플러그 지우고 다시 저장, 플러터에서 수정된 정보 ('/road_plug')다시 호출해서 리셋
@@ -556,6 +558,7 @@ def remove():
 	path = os.getcwd()
 	tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'))
 	tt.drop(tt[tt.ip == ip].index).to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
+	print('플러그 제거 성공')
 	return 'ok'
 
 
@@ -572,8 +575,7 @@ def road():
 
 
 # 플러터에서 온오프할때 여기 데이터셋에서 스테이트 변경되도록하고 플러터에서 온오프할대 road_plug 재호출하도록 수정해야함(o)
-
-def offline_rule_base_on(ip, user_id):
+def offline_rule_base_on(ip,user_id):
 	path = os.getcwd()
 	tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
 	type_agent = tt.loc[tt.ip == ip,['type_agent']].values
@@ -725,10 +727,7 @@ def offline_rule_base_on(ip, user_id):
 				print(history_sam)
 				# file same time error, make another file for save
 				time.sleep(10)
-
-
-
-
+	return 'ok'
 
 
 @bp.route('/rule_base_on')
@@ -737,7 +736,6 @@ def rule_base_on():
 	ip = request.args.get('ip')
 	user_id = request.args.get('user_id')
 	offline_rule_base_on(ip, user_id)
-
 	def generate(ip,user_id):
 		path = os.getcwd()
 		tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
@@ -750,7 +748,6 @@ def rule_base_on():
 		if sensornum != 0 :
 			sql=f"SELECT * FROM sensor_{sensornum} WHERE 날짜 > now() - INTERVAL 10 MINUTE;"
 			# sql="SELECT * FROM sensor_44 WHERE 날짜 > now() - INTERVAL 10 MINUTE;"
-			
 			while rulestat:
 				#
 				conn = pymysql.connect(
@@ -884,14 +881,13 @@ def mean_data():
 		df['hum'] = pd.to_numeric(df['습도'])
 		df = df.set_index('날짜').resample('1T',).mean()
 		df['sensor'] = i
-		
-
 		data_list.append(df)
 
 	data_concated = pd.concat(data_list,axis=0)
 	data_final = data_concated.groupby(['날짜'], as_index=True).mean()
 	data_final.index = data_final.index.strftime('%Y-%m-%d %H:%M:%S')
 	dd = data_final.to_json(orient = 'index')
-	return dd
+	dd_dic = json.loads(dd)
+	return dd_dic
 
 
