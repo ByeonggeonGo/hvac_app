@@ -9,6 +9,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 import numpy as np
 from flask import Blueprint, stream_with_context, request, Response, jsonify
+import asyncio
+from threading import Thread
 
 import os
 import requests
@@ -575,93 +577,27 @@ def road():
 
 
 # 플러터에서 온오프할때 여기 데이터셋에서 스테이트 변경되도록하고 플러터에서 온오프할대 road_plug 재호출하도록 수정해야함(o)
-def offline_rule_base_on(ip,user_id):
-	path = os.getcwd()
-	tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
-	type_agent = tt.loc[tt.ip == ip,['type_agent']].values
+@bp.route('/rule_base_on2')
+def offline_rule_base_on():
+	ip = request.args.get('ip')
+	user_id = request.args.get('user_id')
 
-	sensornum = tt.loc[tt.ip == ip,['sensornum']].values[0][0]
-	if sensornum != 0:
-		sql=f"SELECT * FROM sensor_{sensornum} WHERE 날짜 > now() - INTERVAL 10 MINUTE;"
+	def loop_agent():
+		path = os.getcwd()
+		tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+		type_agent = tt.loc[tt.ip == ip,['type_agent']].values
 
-		if tt.loc[tt.ip == ip,['rulebase']].values[0] == 1:
-			print('rulebase_이미 작동중')
-		elif tt.loc[tt.ip == ip,['rulebase']].values[0] == 0:
-			tt.loc[tt.ip == ip,['rulebase']] = 1
-			tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
-			while True:
-				#
-				conn = pymysql.connect(
-						user='room_test',
-						passwd='ehrnc64581',
-						#222.108.71.247(외부주소)
-						host='222.108.71.247',
-						#7656(외부포트)
-						port=7656,
-						db='sensor',
-						)
-				#
-				df=pd.read_sql_query(sql,conn)
-				conn.close()
-				if df.empty:
-					tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
-					tt.loc[tt.ip == ip,['rulebase']] = 0
-					tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
-					raise StopIteration
-					
-				# df.CO2.values[-1]
-				if type_agent == 'S' or type_agent == 'V':
-					env_val = float(df.CO2.values[-1])
-				else:
-					env_val = float(df.PM.values[-1])
+		sensornum = tt.loc[tt.ip == ip,['sensornum']].values[0][0]
+		if sensornum != 0:
+			sql=f"SELECT * FROM sensor_{sensornum} WHERE 날짜 > now() - INTERVAL 10 MINUTE;"
 
-				#현재 운영 상태
-				path = os.getcwd()
-				tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
-				stat = tt.loc[tt.ip == ip,['on_state']].values[0]
-				set_val = tt.loc[tt.ip == ip,['ruleset']].values[0]
-				if tt.loc[tt.ip == ip,['rulebase']].values[0] == 0:
-					print('rulebase_작동중지')
-					break
-				else: pass
-
-				#조건부 온오프
-				if env_val > int(set_val):
-					if stat: pass
-					else: on_local(ip,user_id)
-					
-				else:
-					if stat: off_local(ip,user_id)
-					else: pass
-				# print('작동중: ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-				#기록저장
-				time_now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-				history_sam = {
-					'time':time_now,
-					'ip':ip,
-					'state':'rulebase_on',
-					'val':env_val ,
-					}
-				
-				#dd = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history_rulebase'+'.csv',))
-				#dd = dd.append(history_sam,ignore_index=True)
-				#dd.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history_rulebase'+'.csv',),index = False)
-				print(history_sam)
-				# file same time error, make another file for save
-				time.sleep(10)
-	elif sensornum == 0 :
-		# sql=f"SELECT * FROM sensor_{sensornum} WHERE 날짜 > now() - INTERVAL 10 MINUTE;"
-		sensor_list = [45,46,47,48,49,50,51,53,]
-
-		if tt.loc[tt.ip == ip,['rulebase']].values[0] == 1:
-			print('rulebase_이미 작동중')
-		elif tt.loc[tt.ip == ip,['rulebase']].values[0] == 0:
-			tt.loc[tt.ip == ip,['rulebase']] = 1
-			tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
-			while True:
-				#
-				val_list = []
-				for i in sensor_list:
+			if tt.loc[tt.ip == ip,['rulebase']].values[0] == 1:
+				print('rulebase_이미 작동중')
+			elif tt.loc[tt.ip == ip,['rulebase']].values[0] == 0:
+				tt.loc[tt.ip == ip,['rulebase']] = 1
+				tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
+				while True:
+					#
 					conn = pymysql.connect(
 							user='room_test',
 							passwd='ehrnc64581',
@@ -672,12 +608,9 @@ def offline_rule_base_on(ip,user_id):
 							db='sensor',
 							)
 					#
-					sql=f"SELECT * FROM sensor_{i} WHERE 날짜 > now() - INTERVAL 10 MINUTE;"
 					df=pd.read_sql_query(sql,conn)
 					conn.close()
-					
 					if df.empty:
-						
 						tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
 						tt.loc[tt.ip == ip,['rulebase']] = 0
 						tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
@@ -688,45 +621,120 @@ def offline_rule_base_on(ip,user_id):
 						env_val = float(df.CO2.values[-1])
 					else:
 						env_val = float(df.PM.values[-1])
-					val_list.append(env_val)
-		
-				max_val = max(val_list)
-				
 
-				#현재 운영 상태
-				path = os.getcwd()
-				tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
-				stat = tt.loc[tt.ip == ip,['on_state']].values[0]
-				set_val = tt.loc[tt.ip == ip,['ruleset']].values[0]
-				if tt.loc[tt.ip == ip,['rulebase']].values[0] == 0:
-					print('rulebase_작동중지')
-					break
-				else: pass
-
-				#조건부 온오프
-				if max_val > int(set_val):
-					if stat: pass
-					else: on_local(ip,user_id)
-					
-				else:
-					if stat: off_local(ip,user_id)
+					#현재 운영 상태
+					path = os.getcwd()
+					tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+					stat = tt.loc[tt.ip == ip,['on_state']].values[0]
+					set_val = tt.loc[tt.ip == ip,['ruleset']].values[0]
+					if tt.loc[tt.ip == ip,['rulebase']].values[0] == 0:
+						print('rulebase_작동중지')
+						break
 					else: pass
-				# print('작동중: ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-				#기록저장
-				time_now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-				history_sam = {
-					'time':time_now,
-					'ip':ip,
-					'state':'rulebase_on',
-					'val':max_val ,
-					}
-				
-				#dd = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history_rulebase'+'.csv',))
-				#dd = dd.append(history_sam,ignore_index=True)
-				#dd.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history_rulebase'+'.csv',),index = False)
-				print(history_sam)
-				# file same time error, make another file for save
-				time.sleep(10)
+
+					#조건부 온오프
+					if env_val > int(set_val):
+						if stat: pass
+						else: on_local(ip,user_id)
+						
+					else:
+						if stat: off_local(ip,user_id)
+						else: pass
+					# print('작동중: ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+					#기록저장
+					time_now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+					history_sam = {
+						'time':time_now,
+						'ip':ip,
+						'state':'rulebase_on',
+						'val':env_val ,
+						}
+					
+					#dd = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history_rulebase'+'.csv',))
+					#dd = dd.append(history_sam,ignore_index=True)
+					#dd.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history_rulebase'+'.csv',),index = False)
+					print(history_sam)
+					# file same time error, make another file for save
+					time.sleep(10)
+		elif sensornum == 0 :
+			# sql=f"SELECT * FROM sensor_{sensornum} WHERE 날짜 > now() - INTERVAL 10 MINUTE;"
+			sensor_list = [45,46,47,48,49,50,51,53,]
+
+			if tt.loc[tt.ip == ip,['rulebase']].values[0] == 1:
+				print('rulebase_이미 작동중')
+			elif tt.loc[tt.ip == ip,['rulebase']].values[0] == 0:
+				tt.loc[tt.ip == ip,['rulebase']] = 1
+				tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
+				while True:
+					#
+					val_list = []
+					for i in sensor_list:
+						conn = pymysql.connect(
+								user='room_test',
+								passwd='ehrnc64581',
+								#222.108.71.247(외부주소)
+								host='222.108.71.247',
+								#7656(외부포트)
+								port=7656,
+								db='sensor',
+								)
+						#
+						sql=f"SELECT * FROM sensor_{i} WHERE 날짜 > now() - INTERVAL 10 MINUTE;"
+						df=pd.read_sql_query(sql,conn)
+						conn.close()
+						
+						if df.empty:
+							
+							tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+							tt.loc[tt.ip == ip,['rulebase']] = 0
+							tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
+							raise StopIteration
+							
+						# df.CO2.values[-1]
+						if type_agent == 'S' or type_agent == 'V':
+							env_val = float(df.CO2.values[-1])
+						else:
+							env_val = float(df.PM.values[-1])
+						val_list.append(env_val)
+			
+					max_val = max(val_list)
+					
+
+					#현재 운영 상태
+					path = os.getcwd()
+					tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+					stat = tt.loc[tt.ip == ip,['on_state']].values[0]
+					set_val = tt.loc[tt.ip == ip,['ruleset']].values[0]
+					if tt.loc[tt.ip == ip,['rulebase']].values[0] == 0:
+						print('rulebase_작동중지')
+						break
+					else: pass
+
+					#조건부 온오프
+					if max_val > int(set_val):
+						if stat: pass
+						else: on_local(ip,user_id)
+						
+					else:
+						if stat: off_local(ip,user_id)
+						else: pass
+					# print('작동중: ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+					#기록저장
+					time_now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+					history_sam = {
+						'time':time_now,
+						'ip':ip,
+						'state':'rulebase_on',
+						'val':max_val ,
+						}
+					
+					#dd = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history_rulebase'+'.csv',))
+					#dd = dd.append(history_sam,ignore_index=True)
+					#dd.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history_rulebase'+'.csv',),index = False)
+					print(history_sam)
+					# file same time error, make another file for save
+					time.sleep(10)
+	loop_agent()
 	return 'ok'
 
 
@@ -735,8 +743,7 @@ def rule_base_on():
 	# http://192.168.0.108:51213/rule_base_on?ip=192.168.0.118&user_id=ehrnc
 	ip = request.args.get('ip')
 	user_id = request.args.get('user_id')
-	offline_rule_base_on(ip, user_id)
-	def generate(ip,user_id):
+	def generate(ip,user_id):	
 		path = os.getcwd()
 		tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
 		# tt.loc[tt.ip == ip,['rulebase']] = 1
@@ -775,6 +782,7 @@ def rule_base_on():
 					env_val = float(df.PM.values[-1])
 
 				yield str(env_val)
+				
 				time.sleep(10)
 		else:
 			sensor_list = [45,46,47,48,49,50,51,53,]
@@ -811,7 +819,9 @@ def rule_base_on():
 				max_val = max(val_list)
 				yield str(max_val)
 				time.sleep(10)
+		
 	return Response(stream_with_context(generate(ip,user_id)))
+	# return Response(stream_with_context(th2.start()))
 
 @bp.route('/rule_base_off')
 def rule_base_off():
@@ -854,9 +864,22 @@ def mean_data():
 	#"http://222.108.71.247:51213/mean_data";
 
 	# user_id = request.args.get('user_id')
-	sensor_list = ['44','45','46','47','48','49',]
+	sensor_list = ['44','45','46','47','48','49','50','51','53']
+	sensor_info = {
+		'44': '거실',
+		'45': '거실(청정기옆)',
+		'46': '안방',
+		'47': '안쪽방',
+		'48': '중간방',
+		'49': '서재(가장아래)',
+		'50': '서재(아래)',
+		'51': '서재(중간)',
+		'53': '서재(맨위)',
+		}
+
 	# sensor_list = ['44','45']
 	data_list = []
+	data_set = {}
 	for i in sensor_list:
 		conn = pymysql.connect(
 		user='room_test',
@@ -869,7 +892,7 @@ def mean_data():
 		)
 
 		#
-		sql=f"SELECT * FROM sensor_{i} WHERE 날짜 > now() - INTERVAL 3 day;"
+		sql=f"SELECT * FROM sensor_{i} WHERE 날짜 > now() - INTERVAL 1 day;"
 
 		#
 		df=pd.read_sql_query(sql,conn)
@@ -879,15 +902,26 @@ def mean_data():
 		df['pm'] = pd.to_numeric(df['PM'])
 		df['temp'] = pd.to_numeric(df['온도'])
 		df['hum'] = pd.to_numeric(df['습도'])
-		df = df.set_index('날짜').resample('1T',).mean()
-		df['sensor'] = i
+		df = df.set_index('날짜').resample('60T',).mean()
+		#
+		df.index = df.index.strftime('%Y-%m-%d %H:%M:%S')
+		data_set[sensor_info[i]] = df.to_json(orient = 'index')
+		
+		#
 		data_list.append(df)
-
+	
+	
 	data_concated = pd.concat(data_list,axis=0)
 	data_final = data_concated.groupby(['날짜'], as_index=True).mean()
-	data_final.index = data_final.index.strftime('%Y-%m-%d %H:%M:%S')
+	# print(data_final)
+	# data_final.index = data_final.index.strftime('%Y-%m-%d %H:%M:%S')
 	dd = data_final.to_json(orient = 'index')
-	dd_dic = json.loads(dd)
+	
+	#
+	data_set['평균'] = dd
+
+	dd_dic = json.dumps(data_set)
+	# dd_dic = json.loads(data_set)
 	return dd_dic
 
 

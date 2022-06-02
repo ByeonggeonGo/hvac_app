@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'dart:convert';
 import 'Controllers.dart';
 import 'package:flutter_neumorphic_null_safety/flutter_neumorphic.dart';
-import 'package:http/http.dart' as http;
-import 'package:bezier_chart/bezier_chart.dart';
+// import 'package:bezier_chart/bezier_chart.dart';
 import 'dart:io';
+
+import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:syncfusion_flutter_charts/sparkcharts.dart';
 
 final plugcontroller = PlugController();
 var page_index = 0.obs;
@@ -23,26 +24,10 @@ Map sensor_info = {
   '53': '서재(맨위)',
 };
 
-var x_list = [];
-var co2_list = [];
-var pm_list = [];
-var temp_list = [];
-
 void main() async {
   plugcontroller.set_plug_list(user_id);
-  await plugcontroller.load_data();
-  plugcontroller.sensor_data.value[0].forEach((k, v) {
-    co2_list.add(double.parse((v['co2']).toStringAsFixed(2)));
-    pm_list.add(double.parse((v['pm']).toStringAsFixed(2)));
-    temp_list.add(double.parse((v['temp']).toStringAsFixed(2)));
+  plugcontroller.load_data();
 
-    var parsedDate = DateTime.parse(k);
-    x_list.add(parsedDate);
-  });
-  var test = List<DataPoint>.generate(x_list.length, (index) {
-    return DataPoint<DateTime>(value: pm_list[index], xAxis: x_list[index]);
-  }).toList();
-  print(test);
   runApp(GetMaterialApp(home: Home()));
 }
 
@@ -825,49 +810,39 @@ class Datapage extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                IconButton(
-                  icon: Icon(Icons.add_box_outlined),
-                  onPressed: () {},
-                ),
-                NeumorphicText(
-                  'Monitoring System',
-                  style: NeumorphicStyle(
-                    shape: NeumorphicShape.flat,
-                    boxShape:
-                        NeumorphicBoxShape.roundRect(BorderRadius.circular(12)),
-                    depth: 10,
-                    lightSource: LightSource.topLeft,
-                    color: Color.fromARGB(146, 22, 22, 22),
-                    surfaceIntensity: 10,
+                InkWell(
+                  child: Container(
+                    child: Text('test'),
                   ),
-                  textStyle: NeumorphicTextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                IconButton(onPressed: () {}, icon: Icon(Icons.restart_alt)),
+                  onTap: () {},
+                )
               ],
             ),
           ),
+          // Flexible(
+          //     flex: 1,
+          //     child: Container(
+          //       color: Colors.red,
+          //       padding: const EdgeInsets.all(6.0),
+          //       // margin: EdgeInsets.all(10),
+          //       )),
+          // SizedBox(height: 100,),
           Flexible(
+              flex: 4,
               fit: FlexFit.tight,
-              // plugcontroller.pluglist.value
-              child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: Column(
-                  children: [
-                    PmChart(),
-                    Co2Chart(),
-                    TempChart(),
-                    Container(
-                      color: Colors.red,
-                      child: Obx((() => plugcontroller.sensor_data.value == 0
-                          ? Text('data loading...')
-                          : Text(pm_list.toString()))),
-                    ),
-                  ],
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Obx(() => plugcontroller.dataset_index.value == 0
+                      ? Text('로딩중...')
+                      : LineChart(
+                        xdata: plugcontroller.sensor_map['거실']['time'],
+                        ydata: plugcontroller.sensor_map['거실']['co2'],
+                        label: 'co2',
+                      ),),
                 ),
-              ))
+              )),
         ],
       ),
     );
@@ -926,7 +901,7 @@ class Bottombox extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(3.0),
               child: NeumorphicText(
-                'SMART SYSTEM',
+                'SCHEDULE',
                 style: NeumorphicStyle(
                   shape: NeumorphicShape.flat,
                   boxShape:
@@ -979,164 +954,121 @@ class Bottombox extends StatelessWidget {
   }
 }
 
-class Co2Chart extends StatelessWidget {
-  const Co2Chart({
+class LineChart extends StatelessWidget {
+  LineChart({
     Key? key,
+    required this.xdata,
+    required this.ydata,
+    required this.label,
   }) : super(key: key);
+  List xdata;
+  List ydata;
+  String label;
 
   @override
   Widget build(BuildContext context) {
-    final fromDate = DateTime.now().subtract(Duration(days: 2));
-    final toDate = DateTime.now();
-
-    return Center(
-      child: Container(
-        color: Color.fromARGB(255, 0, 0, 0),
-        height: MediaQuery.of(context).size.height / 2,
-        width: MediaQuery.of(context).size.width,
-        child: BezierChart(
-          fromDate: fromDate,
-          bezierChartScale: BezierChartScale.HOURLY,
-          toDate: toDate,
-          selectedDate: toDate,
-          series: [
-            BezierLine(
-                label: "CO2",
-                // onMissingValue: (dateTime) {
-                //   if (dateTime.day.isEven) {
-                //     return 10.0;
-                //   }
-                //   return 5.0;
-                // },
-                // data: [
-                //   DataPoint<DateTime>(value: 10, xAxis: x_list[4000]),
-                //   DataPoint<DateTime>(value: 50, xAxis: x_list[4300]),
-                // ],
-
-                data: List<DataPoint>.generate(x_list.length, (index) {
-                  return DataPoint<DateTime>(
-                      value: co2_list[index], xAxis: x_list[index]);
-                }).toList()),
-          ],
-          config: BezierChartConfig(
-            showDataPoints: true,
-            verticalIndicatorStrokeWidth: 3.0,
-            verticalIndicatorColor: Colors.black26,
-            showVerticalIndicator: true,
-            verticalIndicatorFixedPosition: false,
-            backgroundColor: Color.fromARGB(255, 0, 0, 0),
-            footerHeight: 30.0,
-          ),
-        ),
-      ),
+    
+    List<ChartData> datasource = List<ChartData>.generate(xdata.length, (index) {
+          return ChartData(xdata[index], ydata[index]);
+        }).toList();
+    return SfCartesianChart(
+      primaryXAxis: CategoryAxis(),
+      series: <ChartSeries<ChartData, dynamic>>[
+        LineSeries(
+            dataSource: datasource,
+            xValueMapper: (ChartData data, _) => data.x,
+            yValueMapper: (ChartData data, _) => data.y)
+      ],
     );
   }
 }
 
-class PmChart extends StatelessWidget {
-  const PmChart({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final fromDate = DateTime.now().subtract(Duration(days: 2));
-    final toDate = DateTime.now();
-
-    return Center(
-      child: Container(
-        color: Color.fromARGB(255, 0, 0, 0),
-        height: MediaQuery.of(context).size.height / 2,
-        width: MediaQuery.of(context).size.width,
-        child: BezierChart(
-          fromDate: fromDate,
-          bezierChartScale: BezierChartScale.HOURLY,
-          toDate: toDate,
-          selectedDate: toDate,
-          series: [
-            BezierLine(
-                label: "PM",
-                // onMissingValue: (dateTime) {
-                //   if (dateTime.day.isEven) {
-                //     return 10.0;
-                //   }
-                //   return 5.0;
-                // },
-                // data: [
-                //   DataPoint<DateTime>(value: 10, xAxis: x_list[4000]),
-                //   DataPoint<DateTime>(value: 50, xAxis: x_list[4300]),
-                // ],
-
-                data: List<DataPoint>.generate(x_list.length, (index) {
-                  return DataPoint<DateTime>(
-                      value: pm_list[index], xAxis: x_list[index]);
-                }).toList()),
-          ],
-          config: BezierChartConfig(
-            showDataPoints: true,
-            verticalIndicatorStrokeWidth: 3.0,
-            verticalIndicatorColor: Colors.black26,
-            showVerticalIndicator: true,
-            verticalIndicatorFixedPosition: false,
-            backgroundColor: Color.fromARGB(255, 0, 0, 0),
-            footerHeight: 30.0,
-          ),
-        ),
-      ),
-    );
-  }
+class ChartData {
+  ChartData(this.x, this.y);
+  final DateTime x;
+  final double y;
 }
 
-class TempChart extends StatelessWidget {
-  const TempChart({
-    Key? key,
-  }) : super(key: key);
+// class Chart extends StatelessWidget {
+//   Chart({
+//     Key? key,
+//     required this.xdata,
+//     required this.ydata,
+//     required this.label,
+//   }) : super(key: key);
+//   List xdata;
+//   List ydata;
+//   String label;
+//   @override
+//   Widget build(BuildContext context) {
+//     final fromDate = DateTime.now().subtract(Duration(days: 1));
+//     final toDate = DateTime.now();
 
-  @override
-  Widget build(BuildContext context) {
-    final fromDate = DateTime.now().subtract(Duration(days: 2));
-    final toDate = DateTime.now();
+//     return Center(
+//       child: Container(
+//         color: Color.fromARGB(255, 0, 0, 0),
+//         height: MediaQuery.of(context).size.height / 5,
+//         width: MediaQuery.of(context).size.width,
+//         child: BezierChart(
+//           fromDate: fromDate,
+//           bezierChartScale: BezierChartScale.HOURLY,
+//           toDate: toDate,
+//           selectedDate: toDate,
+//           series: [
+//             BezierLine(
+//               lineColor: Colors.blue,
+//               lineStrokeWidth: 1.0,
+              
+//                 label: label,
+//                 data: List<DataPoint>.generate(xdata.length, (index) {
+//                   return DataPoint<DateTime>(
+//                       value: ydata[index], xAxis: xdata[index]);
+//                 }).toList()),
+//           ],
+//           config: BezierChartConfig(
+//             displayYAxis: false,
+//             showDataPoints: false,
+//             xAxisTextStyle: TextStyle(
+//               color: Color.fromARGB(255, 0, 0, 0).withOpacity(0.7),
+//               ),
+            
+//             verticalIndicatorStrokeWidth: 3.0,
+//             verticalIndicatorColor: Colors.black26,
+//             showVerticalIndicator: true,
+//             verticalIndicatorFixedPosition: false,
+//             backgroundColor: Color.fromARGB(255, 255, 255, 255),
+//             footerHeight: 30.0,
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
-    return Center(
-      child: Container(
-        color: Color.fromARGB(255, 0, 0, 0),
-        height: MediaQuery.of(context).size.height / 2,
-        width: MediaQuery.of(context).size.width,
-        child: BezierChart(
-          fromDate: fromDate,
-          bezierChartScale: BezierChartScale.HOURLY,
-          toDate: toDate,
-          selectedDate: toDate,
-          series: [
-            BezierLine(
-                label: "temp",
-                // onMissingValue: (dateTime) {
-                //   if (dateTime.day.isEven) {
-                //     return 10.0;
-                //   }
-                //   return 5.0;
-                // },
-                // data: [
-                //   DataPoint<DateTime>(value: 10, xAxis: x_list[4000]),
-                //   DataPoint<DateTime>(value: 50, xAxis: x_list[4300]),
-                // ],
+// class Chartcol extends StatelessWidget {
+//   Chartcol({Key? key, required this.roomname}) : super(key: key);
+//   String roomname;
 
-                data: List<DataPoint>.generate(x_list.length, (index) {
-                  return DataPoint<DateTime>(
-                      value: temp_list[index], xAxis: x_list[index]);
-                }).toList()),
-          ],
-          config: BezierChartConfig(
-            showDataPoints: true,
-            verticalIndicatorStrokeWidth: 3.0,
-            verticalIndicatorColor: Colors.black26,
-            showVerticalIndicator: true,
-            verticalIndicatorFixedPosition: false,
-            backgroundColor: Color.fromARGB(255, 0, 0, 0),
-            footerHeight: 30.0,
-          ),
-        ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Column(
+//       children: [
+//         Chart(
+//           xdata: plugcontroller.sensor_map[roomname]['time'],
+//           ydata: plugcontroller.sensor_map[roomname]['co2'],
+//           label: 'co2',
+//         ),
+//         Chart(
+//           xdata: plugcontroller.sensor_map[roomname]['time'],
+//           ydata: plugcontroller.sensor_map[roomname]['pm'],
+//           label: 'pm',
+//         ),
+//         Chart(
+//           xdata: plugcontroller.sensor_map[roomname]['time'],
+//           ydata: plugcontroller.sensor_map[roomname]['temp'],
+//           label: 'temp',
+//         ),
+//       ],
+//     );
+//   }
+// }

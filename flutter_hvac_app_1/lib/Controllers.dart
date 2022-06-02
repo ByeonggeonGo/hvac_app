@@ -6,10 +6,13 @@ import 'dart:convert';
 class PlugController extends GetxController {
   var _pluglist = [].obs;
   RxList sensor_data = [].obs;
+  Map _sensor_map = {};
   var dataset_index = 0.obs;
   String sensor_dataset_Url = "http://222.108.71.247:51213/mean_data";
   RxList get pluglist => _pluglist;
   String pub_ip = '222.108.71.247:51213';
+
+  Map get sensor_map => _sensor_map;
 
   add_plug(String user_id, String ip, String name, String sensornum,
       String typeagent, String ruleset) async {
@@ -126,6 +129,25 @@ class PlugController extends GetxController {
         headers: {"Access-Control_Allow_Origin": "*"}).then((Response) {
       if (Response.statusCode == 200) {
         sensor_data.add(jsonDecode(Response.body));
+        
+        // print(sensor_data.value[0]['거실']);
+        sensor_data.value[0].forEach((k, v) {
+          _sensor_map[k] = {
+            'co2': jsonDecode(v).entries.map<double>((e) {
+              return double.parse(e.value['co2'].toStringAsFixed(2));
+            }).toList(),
+            'pm': jsonDecode(v).entries.map<double>((e) {
+              return double.parse(e.value['pm'].toStringAsFixed(2));
+            }).toList(),
+            'temp': jsonDecode(v).entries.map<double>((e) {
+              return double.parse(e.value['temp'].toStringAsFixed(2));
+            }).toList(),
+            'time': jsonDecode(v).entries.map<DateTime>((e) {
+              return DateTime.parse(e.key);
+            }).toList()
+          };
+        });
+        dataset_index.value = 1;
       } else {}
     });
   }
