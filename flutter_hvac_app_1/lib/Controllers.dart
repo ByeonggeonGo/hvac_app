@@ -200,4 +200,13 @@ class SmartPlug extends GetxController {
 
     // http://222.108.71.247:51213/rule_base_off?ip=192.168.0.118&user_id=ehrnc
   }
+
+  rule_base_on2(String user_id) async {
+    String rulebaseonUrl2 =
+        "http://222.108.71.247:51213/rule_base_on2?ip=${ip}&user_id=${user_id}";
+    await http.get(Uri.parse(rulebaseonUrl2),
+        headers: {"Access-Control_Allow_Origin": "*"}).then((Response) {
+      Response.statusCode == 200 ? print('ok루프시작') : null;
+    });
+  }
 }

@@ -7,8 +7,6 @@ import 'package:http/http.dart' as http;
 import 'package:bezier_chart/bezier_chart.dart';
 import 'dart:io';
 
-
-
 final plugcontroller = PlugController();
 var page_index = 0.obs;
 var user_id = 'ehrnc';
@@ -25,9 +23,26 @@ Map sensor_info = {
   '53': '서재(맨위)',
 };
 
+var x_list = [];
+var co2_list = [];
+var pm_list = [];
+var temp_list = [];
+
 void main() async {
   plugcontroller.set_plug_list(user_id);
-  plugcontroller.load_data();
+  await plugcontroller.load_data();
+  plugcontroller.sensor_data.value[0].forEach((k, v) {
+    co2_list.add(double.parse((v['co2']).toStringAsFixed(2)));
+    pm_list.add(double.parse((v['pm']).toStringAsFixed(2)));
+    temp_list.add(double.parse((v['temp']).toStringAsFixed(2)));
+
+    var parsedDate = DateTime.parse(k);
+    x_list.add(parsedDate);
+  });
+  var test = List<DataPoint>.generate(x_list.length, (index) {
+    return DataPoint<DateTime>(value: pm_list[index], xAxis: x_list[index]);
+  }).toList();
+  print(test);
   runApp(GetMaterialApp(home: Home()));
 }
 
@@ -432,16 +447,22 @@ class Mainhome extends StatelessWidget {
                                     selectedIndex: plugcontroller.pluglist
                                         .value[index].rulebasestate.value,
                                     displayForegroundOnlyIfSelected: true,
-                                    onChanged: (value) {
+                                    onChanged: (value) async {
                                       plugcontroller.pluglist.value[index]
                                           .rulebasestate.value = value;
-                                      value == 1 ?
-                                        plugcontroller.pluglist.value[index]
-                                            .rule_base_on(user_id):
-                                      
+                                      if (value == 1) {
+                                        await plugcontroller
+                                            .pluglist.value[index]
+                                            .rule_base_on(user_id);
+                                        sleep(Duration(seconds: 1));
+                                        await plugcontroller
+                                            .pluglist.value[index]
+                                            .rule_base_on2(user_id);
+                                      } else {
                                         plugcontroller.pluglist.value[index]
                                             .rule_base_off(user_id);
-                                      
+                                      }
+
                                       // plugcontroller.set_plug_list(user_id);
                                     },
                                     thumb: Neumorphic(),
@@ -539,7 +560,8 @@ class Mainhome extends StatelessWidget {
                                                           padding:
                                                               const EdgeInsets
                                                                   .all(2.0),
-                                                          child: Text('name: '+ name_t),
+                                                          child: Text('name: ' +
+                                                              name_t),
                                                         ),
                                                       ],
                                                     ),
@@ -569,7 +591,8 @@ class Mainhome extends StatelessWidget {
                                                           padding:
                                                               const EdgeInsets
                                                                   .all(2.0),
-                                                          child: Text('ip: '+ip_t),
+                                                          child: Text(
+                                                              'ip: ' + ip_t),
                                                         ),
                                                       ],
                                                     ),
@@ -687,16 +710,18 @@ class Mainhome extends StatelessWidget {
                                                           MainAxisAlignment.end,
                                                       children: [
                                                         TextButton(
-                                                          onPressed: () async{
+                                                          onPressed: () async {
                                                             if (sensor_info[
                                                                     sensornum_t] !=
                                                                 null) {
+                                                              Get.back();
                                                               await plugcontroller
                                                                   .remove_plug(
                                                                       user_id,
                                                                       ip_t,
                                                                       name_t);
-                                                              sleep(Duration(seconds:1));
+                                                              sleep(Duration(
+                                                                  seconds: 1));
                                                               await plugcontroller
                                                                   .add_plug(
                                                                       user_id,
@@ -705,11 +730,11 @@ class Mainhome extends StatelessWidget {
                                                                       sensornum_t,
                                                                       typeagent_t,
                                                                       ruleset_t);
-                                                              sleep(Duration(seconds:1));
+                                                              sleep(Duration(
+                                                                  seconds: 1));
                                                               plugcontroller
                                                                   .set_plug_list(
                                                                       user_id);
-                                                              Get.back();
                                                             } else {
                                                               Get.dialog(AlertDialog(
                                                                   title:
@@ -831,12 +856,14 @@ class Datapage extends StatelessWidget {
                 scrollDirection: Axis.vertical,
                 child: Column(
                   children: [
-                    Chart(),
+                    PmChart(),
+                    Co2Chart(),
+                    TempChart(),
                     Container(
                       color: Colors.red,
                       child: Obx((() => plugcontroller.sensor_data.value == 0
                           ? Text('data loading...')
-                          : Text(plugcontroller.sensor_data.value.toString()))),
+                          : Text(pm_list.toString()))),
                     ),
                   ],
                 ),
@@ -952,50 +979,160 @@ class Bottombox extends StatelessWidget {
   }
 }
 
-class Chart extends StatelessWidget {
-  const Chart({
+class Co2Chart extends StatelessWidget {
+  const Co2Chart({
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final fromDate = DateTime(2019, 05, 22);
+    final fromDate = DateTime.now().subtract(Duration(days: 2));
     final toDate = DateTime.now();
-
-    final date1 = DateTime.now().subtract(Duration(days: 2));
-    final date2 = DateTime.now().subtract(Duration(days: 3));
 
     return Center(
       child: Container(
-        color: Colors.red,
+        color: Color.fromARGB(255, 0, 0, 0),
         height: MediaQuery.of(context).size.height / 2,
         width: MediaQuery.of(context).size.width,
         child: BezierChart(
           fromDate: fromDate,
-          bezierChartScale: BezierChartScale.WEEKLY,
+          bezierChartScale: BezierChartScale.HOURLY,
           toDate: toDate,
           selectedDate: toDate,
           series: [
             BezierLine(
-              label: "Duty",
-              onMissingValue: (dateTime) {
-                if (dateTime.day.isEven) {
-                  return 10.0;
-                }
-                return 5.0;
-              },
-              data: [
-                DataPoint<DateTime>(value: 10, xAxis: date1),
-                DataPoint<DateTime>(value: 50, xAxis: date2),
-              ],
-            ),
+                label: "CO2",
+                // onMissingValue: (dateTime) {
+                //   if (dateTime.day.isEven) {
+                //     return 10.0;
+                //   }
+                //   return 5.0;
+                // },
+                // data: [
+                //   DataPoint<DateTime>(value: 10, xAxis: x_list[4000]),
+                //   DataPoint<DateTime>(value: 50, xAxis: x_list[4300]),
+                // ],
+
+                data: List<DataPoint>.generate(x_list.length, (index) {
+                  return DataPoint<DateTime>(
+                      value: co2_list[index], xAxis: x_list[index]);
+                }).toList()),
           ],
           config: BezierChartConfig(
+            showDataPoints: true,
             verticalIndicatorStrokeWidth: 3.0,
             verticalIndicatorColor: Colors.black26,
             showVerticalIndicator: true,
             verticalIndicatorFixedPosition: false,
-            backgroundColor: Colors.red,
+            backgroundColor: Color.fromARGB(255, 0, 0, 0),
+            footerHeight: 30.0,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class PmChart extends StatelessWidget {
+  const PmChart({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final fromDate = DateTime.now().subtract(Duration(days: 2));
+    final toDate = DateTime.now();
+
+    return Center(
+      child: Container(
+        color: Color.fromARGB(255, 0, 0, 0),
+        height: MediaQuery.of(context).size.height / 2,
+        width: MediaQuery.of(context).size.width,
+        child: BezierChart(
+          fromDate: fromDate,
+          bezierChartScale: BezierChartScale.HOURLY,
+          toDate: toDate,
+          selectedDate: toDate,
+          series: [
+            BezierLine(
+                label: "PM",
+                // onMissingValue: (dateTime) {
+                //   if (dateTime.day.isEven) {
+                //     return 10.0;
+                //   }
+                //   return 5.0;
+                // },
+                // data: [
+                //   DataPoint<DateTime>(value: 10, xAxis: x_list[4000]),
+                //   DataPoint<DateTime>(value: 50, xAxis: x_list[4300]),
+                // ],
+
+                data: List<DataPoint>.generate(x_list.length, (index) {
+                  return DataPoint<DateTime>(
+                      value: pm_list[index], xAxis: x_list[index]);
+                }).toList()),
+          ],
+          config: BezierChartConfig(
+            showDataPoints: true,
+            verticalIndicatorStrokeWidth: 3.0,
+            verticalIndicatorColor: Colors.black26,
+            showVerticalIndicator: true,
+            verticalIndicatorFixedPosition: false,
+            backgroundColor: Color.fromARGB(255, 0, 0, 0),
+            footerHeight: 30.0,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class TempChart extends StatelessWidget {
+  const TempChart({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final fromDate = DateTime.now().subtract(Duration(days: 2));
+    final toDate = DateTime.now();
+
+    return Center(
+      child: Container(
+        color: Color.fromARGB(255, 0, 0, 0),
+        height: MediaQuery.of(context).size.height / 2,
+        width: MediaQuery.of(context).size.width,
+        child: BezierChart(
+          fromDate: fromDate,
+          bezierChartScale: BezierChartScale.HOURLY,
+          toDate: toDate,
+          selectedDate: toDate,
+          series: [
+            BezierLine(
+                label: "temp",
+                // onMissingValue: (dateTime) {
+                //   if (dateTime.day.isEven) {
+                //     return 10.0;
+                //   }
+                //   return 5.0;
+                // },
+                // data: [
+                //   DataPoint<DateTime>(value: 10, xAxis: x_list[4000]),
+                //   DataPoint<DateTime>(value: 50, xAxis: x_list[4300]),
+                // ],
+
+                data: List<DataPoint>.generate(x_list.length, (index) {
+                  return DataPoint<DateTime>(
+                      value: temp_list[index], xAxis: x_list[index]);
+                }).toList()),
+          ],
+          config: BezierChartConfig(
+            showDataPoints: true,
+            verticalIndicatorStrokeWidth: 3.0,
+            verticalIndicatorColor: Colors.black26,
+            showVerticalIndicator: true,
+            verticalIndicatorFixedPosition: false,
+            backgroundColor: Color.fromARGB(255, 0, 0, 0),
             footerHeight: 30.0,
           ),
         ),
