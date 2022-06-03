@@ -417,7 +417,8 @@ def on_local(ip,user_id):
 	name_plug = tt.loc[tt.ip == ip,['plug_name']].values[0][0]
 	#기록저장
 	time_now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-	dd = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',),encoding='euc-kr')
+	# dd = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',),encoding='euc-kr')
+	dd = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',))
 	history_sam = {
 		'time':time_now,
 		'ip':ip,
@@ -427,7 +428,8 @@ def on_local(ip,user_id):
 	
 
 	dd = dd.append(history_sam,ignore_index=True)
-	dd.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',),index = False,encoding='euc-kr')
+	# dd.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',),index = False,encoding='euc-kr')
+	dd.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',),index = False)
 
 
 
@@ -447,7 +449,8 @@ def off_local(ip,user_id):
 	name_plug = tt.loc[tt.ip == ip,['plug_name']].values[0][0]
 	#기록저장
 	time_now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-	dd = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',),encoding='euc-kr')
+	# dd = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',),encoding='euc-kr')
+	dd = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',))
 	history_sam = {
 		'time':time_now,
 		'ip':ip,
@@ -457,7 +460,8 @@ def off_local(ip,user_id):
 	
 	
 	dd = dd.append(history_sam,ignore_index=True)
-	dd.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',),index = False,encoding='euc-kr')
+	# dd.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',),index = False,encoding='euc-kr')
+	dd.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',),index = False)
 
 
 
@@ -849,7 +853,8 @@ def onoff_history():
 
 	user_id = request.args.get('user_id')
 	path = os.getcwd()
-	history_df = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',),encoding='euc-kr')
+	# history_df = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',),encoding='euc-kr')
+	history_df = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history'+'.csv',))
 	dd = history_df.to_json()
 	return dd
 
