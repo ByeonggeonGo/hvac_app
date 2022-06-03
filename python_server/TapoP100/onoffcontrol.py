@@ -892,7 +892,7 @@ def mean_data():
 		)
 
 		#
-		sql=f"SELECT * FROM sensor_{i} WHERE 날짜 > now() - INTERVAL 1 day;"
+		sql=f"SELECT * FROM sensor_{i} WHERE 날짜 > now() - INTERVAL 3 day;"
 
 		#
 		df=pd.read_sql_query(sql,conn)
@@ -902,7 +902,7 @@ def mean_data():
 		df['pm'] = pd.to_numeric(df['PM'])
 		df['temp'] = pd.to_numeric(df['온도'])
 		df['hum'] = pd.to_numeric(df['습도'])
-		df = df.set_index('날짜').resample('60T',).mean()
+		df = df.set_index('날짜').resample('30T',).mean()
 		#
 		df.index = df.index.strftime('%Y-%m-%d %H:%M:%S')
 		data_set[sensor_info[i]] = df.to_json(orient = 'index')

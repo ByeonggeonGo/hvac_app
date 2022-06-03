@@ -10,6 +10,7 @@ import 'package:syncfusion_flutter_charts/sparkcharts.dart';
 
 final plugcontroller = PlugController();
 var page_index = 0.obs;
+var data_val_index = 'co2'.obs;
 var user_id = 'ehrnc';
 Map sensor_info = {
   '0': '최댓값',
@@ -795,55 +796,152 @@ class Datapage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Column(
-        // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SizedBox(
-            height: 70,
-          ),
-          Neumorphic(
-            // height: 70,
-            // color: Color.fromARGB(255, 255, 255, 255),
-            margin: EdgeInsets.all(10),
-            padding: EdgeInsets.all(4),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                InkWell(
-                  child: Container(
-                    child: Text('test'),
-                  ),
-                  onTap: () {},
-                )
-              ],
+      child: SizedBox(
+        height: 600,
+        child: Column(
+          // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(
+              height: 70,
             ),
-          ),
-          // Flexible(
-          //     flex: 1,
-          //     child: Container(
-          //       color: Colors.red,
-          //       padding: const EdgeInsets.all(6.0),
-          //       // margin: EdgeInsets.all(10),
-          //       )),
-          // SizedBox(height: 100,),
-          Flexible(
-              flex: 4,
-              fit: FlexFit.tight,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Obx(() => plugcontroller.dataset_index.value == 0
-                      ? Text('로딩중...')
-                      : LineChart(
-                        xdata: plugcontroller.sensor_map['거실']['time'],
-                        ydata: plugcontroller.sensor_map['거실']['co2'],
-                        label: 'co2',
-                      ),),
+            Neumorphic(
+              // height: 70,
+              // color: Color.fromARGB(255, 255, 255, 255),
+              margin: EdgeInsets.all(10),
+              padding: EdgeInsets.all(4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Container(
+                    height: 30,
+                    child: NeumorphicText(
+                  'Monitoring System',
+                  style: NeumorphicStyle(
+                    shape: NeumorphicShape.flat,
+                    boxShape:
+                        NeumorphicBoxShape.roundRect(BorderRadius.circular(12)),
+                    depth: 10,
+                    lightSource: LightSource.topLeft,
+                    color: Color.fromARGB(146, 31, 31, 30),
+                    surfaceIntensity: 10,
+                  ),
+                  textStyle: NeumorphicTextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
-              )),
-        ],
+                  )
+                ],
+              ),
+            ),
+            Flexible(
+                flex: 1,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        data_val_index.value = 'co2';
+                      },
+                      child: SizedBox(
+                        // height: 50,
+                        width: 80,
+                        child: Obx(()=>NeumorphicText(
+                                  'CO2',
+                                  style: NeumorphicStyle(
+                                    shape: NeumorphicShape.flat,
+                                    boxShape:
+                                          NeumorphicBoxShape.roundRect(BorderRadius.circular(12)),
+                                    depth: 10,
+                                    lightSource: LightSource.topLeft,
+                                    color: data_val_index.value == 'co2'? Color.fromARGB(255, 0, 173, 52) : Color.fromARGB(146, 39, 39, 37),
+                                    surfaceIntensity: 10,
+                                  ),
+                                  textStyle: NeumorphicTextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                )
+                              ),
+                            ),
+                          ),
+                    InkWell(
+                      onTap: () {
+                        data_val_index.value = 'pm';
+                      },
+                      child: SizedBox(
+                        // height: 50,
+                        width: 80,
+                        child: Obx(()=>NeumorphicText(
+                                  'PM',
+                                  style: NeumorphicStyle(
+                                    shape: NeumorphicShape.flat,
+                                    boxShape:
+                                          NeumorphicBoxShape.roundRect(BorderRadius.circular(12)),
+                                    depth: 10,
+                                    lightSource: LightSource.topLeft,
+                                    color: data_val_index.value == 'pm'? Color.fromARGB(255, 0, 173, 52) : Color.fromARGB(146, 39, 39, 37),
+                                    surfaceIntensity: 10,
+                                  ),
+                                  textStyle: NeumorphicTextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                )
+                              ),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        data_val_index.value = 'temp';
+                      },
+                      child: SizedBox(
+                        // height: 50,
+                        width: 80,
+                        child: Obx(()=>NeumorphicText(
+                                  'TEMP',
+                                  style: NeumorphicStyle(
+                                    shape: NeumorphicShape.flat,
+                                    boxShape:
+                                          NeumorphicBoxShape.roundRect(BorderRadius.circular(12)),
+                                    depth: 10,
+                                    lightSource: LightSource.topLeft,
+                                    color: data_val_index.value == 'temp'? Color.fromARGB(255, 0, 173, 52) : Color.fromARGB(146, 39, 39, 37),
+                                    surfaceIntensity: 10,
+                                  ),
+                                  textStyle: NeumorphicTextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                )
+                              ),
+                      ),
+                    ),
+                  ],
+                )),
+            SizedBox(
+              height: 30,
+            ),
+            Flexible(
+                flex: 4,
+                fit: FlexFit.tight,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Obx(
+                      () => plugcontroller.dataset_index.value == 0
+                          ? Text('로딩중...')
+                          : LineChart(
+                              datamap: plugcontroller.sensor_map,
+                              valname: data_val_index.value,
+                            ),
+                    ),
+                  ),
+                )),
+          ],
+        ),
       ),
     );
   }
@@ -957,28 +1055,61 @@ class Bottombox extends StatelessWidget {
 class LineChart extends StatelessWidget {
   LineChart({
     Key? key,
-    required this.xdata,
-    required this.ydata,
-    required this.label,
+    required this.datamap,
+    required this.valname,
   }) : super(key: key);
-  List xdata;
-  List ydata;
-  String label;
+  Map datamap;
+  String valname;
+  // DateTime min;
+  // DateTime max;
 
   @override
   Widget build(BuildContext context) {
-    
-    List<ChartData> datasource = List<ChartData>.generate(xdata.length, (index) {
-          return ChartData(xdata[index], ydata[index]);
-        }).toList();
+    List<LineSeries<ChartData, dynamic>> linelist =
+        datamap.entries.map<LineSeries<ChartData, dynamic>>((e) {
+      // min = e.value['time'][0];
+      // max = e.value['time'][-1];
+      return LineSeries(
+          name: e.key,
+          dataSource: List<ChartData>.generate(datamap[e.key]['time'].length, (index) {
+            return ChartData(e.value['time'][index], e.value[valname][index]);
+          }).toList(),
+          xValueMapper: (ChartData data, _) => data.x,
+          yValueMapper: (ChartData data, _) => data.y);
+    }).toList();
     return SfCartesianChart(
-      primaryXAxis: CategoryAxis(),
-      series: <ChartSeries<ChartData, dynamic>>[
-        LineSeries(
-            dataSource: datasource,
-            xValueMapper: (ChartData data, _) => data.x,
-            yValueMapper: (ChartData data, _) => data.y)
-      ],
+      enableAxisAnimation: true,
+      backgroundColor: Color.fromARGB(31, 145, 172, 180),
+      primaryXAxis: DateTimeAxis(
+        // minimum: DateTime(datamap['거실']['time'][0].year,
+        //     datamap['거실']['time'][0].month, datamap['거실']['time'][0].day, datamap['거실']['time'][0].hour),
+        // maximum: DateTime(datamap['거실']['time'].last.year,
+        //     datamap['거실']['time'].last.month, datamap['거실']['time'].last.day),
+        // anchorRangeToVisiblePoints: false,
+        // labelRotation: 10,
+        desiredIntervals: 6,
+        // minorTicksPerInterval: 3000,
+        autoScrollingDeltaType: DateTimeIntervalType.hours,
+        intervalType: DateTimeIntervalType.days,
+        // autoScrollingDeltaType: DateTimeIntervalType.days,
+      ),
+      legend: Legend(
+          isVisible: true,
+          toggleSeriesVisibility: true,
+          overflowMode: LegendItemOverflowMode.wrap,
+          // offset: Offset(20, 40),
+          // height: '200',
+          position: LegendPosition.bottom
+          // borderWidth: 2,
+          ),
+      series: linelist,
+      zoomPanBehavior: ZoomPanBehavior(
+        enablePinching: true,
+        zoomMode: ZoomMode.x,
+        enablePanning: true,
+        enableDoubleTapZooming: true,
+        enableMouseWheelZooming: true,
+      ),
     );
   }
 }
