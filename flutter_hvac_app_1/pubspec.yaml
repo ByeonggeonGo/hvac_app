@@ -39,6 +39,8 @@ dependencies:
   search_choices: ^2.0.19
   flutter_neumorphic_null_safety: ^3.2.4
   syncfusion_flutter_charts: ^20.1.58+1
+  hive: ^2.2.1
+  hive_flutter: ^1.1.0
 
 dev_dependencies:
   flutter_test:

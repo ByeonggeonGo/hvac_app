@@ -14,6 +14,12 @@ class PlugController extends GetxController {
 
   Map get sensor_map => _sensor_map;
 
+  
+  
+
+
+
+
   add_plug(String user_id, String ip, String name, String sensornum,
       String typeagent, String ruleset) async {
     // SmartPlug plug = SmartPlug();
@@ -99,9 +105,12 @@ class PlugController extends GetxController {
             plug.ruleset.value = jsonDecode(Response.body)['ruleset']['$i'];
             plug.sensornum = '${jsonDecode(Response.body)['sensornum']['$i']}';
             plug.typeagent = jsonDecode(Response.body)['type_agent']['$i'];
+            plug.schedule.value = jsonDecode(Response.body)['schedule']['$i'];
             if (plug.rulebasestate.value == 0) {
               _pluglist.add(plug);
             } else {
+              // 기존에 룰베이스 켜져있던 플러그 다시 호출해서 실시간데이터 받기, 서버단에서는 이미 룰베이스 켜져있을경우
+              // 조건문처리해서 중복실행 안되도록 설정했음
               plug.rule_base_on(user_id);
               _pluglist.add(plug);
             }
@@ -118,6 +127,8 @@ class PlugController extends GetxController {
             plug.ruleset.value = jsonDecode(Response.body)['ruleset']['$i'];
             plug.sensornum = '${jsonDecode(Response.body)['sensornum']['$i']}';
             plug.typeagent = jsonDecode(Response.body)['type_agent']['$i'];
+            plug.schedule.value = jsonDecode(Response.body)['schedule']['$i'];
+
           }
         }
       }
@@ -162,6 +173,7 @@ class SmartPlug extends GetxController {
   String sensornum = '';
   RxString sensorval = ''.obs;
   String typeagent = '';
+  RxInt schedule = 0.obs;
 
   turn_on(String user_id) async {
     String onUrl = "http://222.108.71.247:51213/on?ip=${ip}&user_id=${user_id}";

@@ -542,6 +542,7 @@ def add():
 		'ruleset':ruleset,
 		'sensornum':sensornum,
 		'type_agent':type_agent,
+		'schedule':0,
 	}
 	print(plug)
 

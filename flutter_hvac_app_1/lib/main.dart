@@ -4,7 +4,8 @@ import 'Controllers.dart';
 import 'package:flutter_neumorphic_null_safety/flutter_neumorphic.dart';
 // import 'package:bezier_chart/bezier_chart.dart';
 import 'dart:io';
-
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_charts/sparkcharts.dart';
 
@@ -24,11 +25,29 @@ Map sensor_info = {
   '51': '서재(중간)',
   '53': '서재(맨위)',
 };
-
+var box;
+RxList boxobs = [].obs;
 void main() async {
   plugcontroller.set_plug_list(user_id);
   plugcontroller.load_data();
 
+  var path = Directory.current.path;
+  // Hive..init(path);
+  await Hive.initFlutter();
+  Box bbox = await Hive.openBox('alarm_db');
+  // await bbox.clear();
+  box = bbox;
+  boxobs.value = box.values.toList().map((e) {
+    RxInt rxstate = 0.obs;
+    rxstate.value = e['state'];
+    Map alarmdata = {
+      'name': e['name'],
+      'start': e['start'],
+      'end': e['end'],
+      'state': rxstate,
+    };
+    return alarmdata;
+  }).toList();
   runApp(GetMaterialApp(home: Home()));
 }
 
@@ -45,7 +64,6 @@ class Home_page extends StatelessWidget {
   const Home_page({
     Key? key,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Obx(() => Scaffold(
@@ -74,18 +92,313 @@ class Secondpage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        // crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SizedBox(
-            height: 100,
-          ),
-          Text('Update......'),
-          SizedBox(
-            height: 400,
-          ),
-        ],
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: SizedBox(
+        height: 600,
+        child: Column(
+          // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(
+              height: 70,
+            ),
+            Neumorphic(
+              // height: 70,
+              // color: Color.fromARGB(255, 255, 255, 255),
+              margin: EdgeInsets.all(10),
+              padding: EdgeInsets.all(4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Container(
+                    // height: 30,
+                    child: NeumorphicText(
+                      'Schedule',
+                      style: NeumorphicStyle(
+                        shape: NeumorphicShape.flat,
+                        boxShape: NeumorphicBoxShape.roundRect(
+                            BorderRadius.circular(12)),
+                        depth: 10,
+                        lightSource: LightSource.topLeft,
+                        color: Color.fromARGB(146, 31, 31, 30),
+                        surfaceIntensity: 10,
+                      ),
+                      textStyle: NeumorphicTextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Flexible(
+              fit: FlexFit.tight,
+              // plugcontroller.pluglist.value
+              child: Obx(() => ListView(
+                    children: List<Widget>.generate(
+                        plugcontroller.pluglist.value.length, (index) {
+                      return Neumorphic(
+                        style: NeumorphicStyle(
+                          shape: NeumorphicShape.flat,
+                          boxShape: NeumorphicBoxShape.roundRect(
+                              BorderRadius.circular(10)),
+                          depth: 7,
+                          lightSource: LightSource.topLeft,
+                          color: plugcontroller.pluglist.value[index]
+                                      .rulebasestate.value ==
+                                  0
+                              ? Color.fromARGB(146, 197, 199, 185)
+                              : Color.fromARGB(146, 148, 160, 82),
+                          shadowDarkColor: Color.fromARGB(170, 0, 0, 0),
+                          shadowLightColor: Color.fromARGB(255, 255, 255, 255),
+                          surfaceIntensity: 10,
+                        ),
+                        // color: Color.fromARGB(255, 212, 212, 212),
+                        // height: 200,
+                        margin: EdgeInsets.all(10),
+                        // padding: EdgeInsets.all(4),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Flexible(
+                                  flex: 1,
+                                  child: IconButton(
+                                    icon: Icon(Icons.add_box_outlined),
+                                    onPressed: () async {
+                                      // Box box = await Hive.openBox('alarm_db');
+                                      // await box.clear();
+                                      String name = plugcontroller
+                                          .pluglist.value[index].name;
+                                      String start = '09';
+                                      String end = '15';
+                                      int state = 0;
+                                      // print(box.getAt(8));
+                                      // print(box.getAt(1));
+                                      print(box.keys);
+                                      print(box.values);
+                                      // print(box.values.toList()[0]);
+                                      Get.dialog(AlertDialog(
+                                        title: const Text('Schedule'),
+                                        content: const Text('추가 정보를 입력하세요.'),
+                                        actions: [
+                                          Container(
+                                              height: 300,
+                                              child: SingleChildScrollView(
+                                                  child: Column(
+                                                children: [
+                                                  SizedBox(
+                                                    height: 50,
+                                                    child: TextField(
+                                                      decoration: const InputDecoration(
+                                                          border:
+                                                              OutlineInputBorder(),
+                                                          hintText:
+                                                              'Start_time_ex: 09'),
+                                                      onChanged: (value) {
+                                                        start = value;
+                                                      },
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    height: 50,
+                                                    child: TextField(
+                                                      decoration: const InputDecoration(
+                                                          border:
+                                                              OutlineInputBorder(),
+                                                          hintText:
+                                                              'End_time_ex: 14'),
+                                                      onChanged: (value) {
+                                                        end = value;
+                                                      },
+                                                    ),
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      List<String> check_list =
+                                                          [
+                                                        '00',
+                                                        '01',
+                                                        '02',
+                                                        '03',
+                                                        '04',
+                                                        '05',
+                                                        '06',
+                                                        '07',
+                                                        '08',
+                                                        '09',
+                                                        '10',
+                                                        '11',
+                                                        '12',
+                                                        '13',
+                                                        '14',
+                                                        '15',
+                                                        '16',
+                                                        '17',
+                                                        '18',
+                                                        '19',
+                                                        '20',
+                                                        '21',
+                                                        '22',
+                                                        '23',
+                                                        '24',
+                                                      ];
+                                                      if (check_list
+                                                              .contains(start) &
+                                                          check_list
+                                                              .contains(end)) {
+                                                        Map alarm = {
+                                                          'name': name,
+                                                          'start': start,
+                                                          'end': end,
+                                                          'state': state,
+                                                        };
+                                                        box.add(alarm);
+                                                        boxobs.value = box
+                                                            .values
+                                                            .toList()
+                                                            .map((e) {
+                                                          RxInt rxstate = 0.obs;
+                                                          rxstate.value =
+                                                              e['state'];
+                                                          Map alarmdata = {
+                                                            'name': e['name'],
+                                                            'start': e['start'],
+                                                            'end': e['end'],
+                                                            'state': rxstate,
+                                                          };
+                                                          return alarmdata;
+                                                        }).toList();
+                                                        Get.back();
+                                                      } else {
+                                                        AlertDialog(
+                                                          title: const Text(
+                                                              '시간 양식이 맞지 않습니다.'),
+                                                        );
+                                                      }
+                                                    },
+                                                    child: const Text("추가"),
+                                                  ),
+                                                ],
+                                              )))
+                                        ],
+                                      ));
+                                    },
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 100,
+                                  child: NeumorphicText(
+                                    plugcontroller.pluglist.value[index].name,
+                                    style: NeumorphicStyle(
+                                      shape: NeumorphicShape.flat,
+                                      boxShape: NeumorphicBoxShape.roundRect(
+                                          BorderRadius.circular(12)),
+                                      depth: 10,
+                                      lightSource: LightSource.top,
+                                      color: Color.fromARGB(146, 41, 41, 41),
+                                      surfaceIntensity: 10,
+                                    ),
+                                    textStyle: NeumorphicTextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                                Flexible(
+                                  flex: 1,
+                                  child: SizedBox(
+                                    width: 30,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Container(
+                              height: 2,
+                              color: Color.fromARGB(31, 36, 35, 35),
+                            ),
+                            Column(
+                              // children: [Text(box.values.toList().toString())],
+                              children: List<Widget>.generate(
+                                  boxobs.value.length, (index2) {
+                                if (boxobs.value[index2]['name'] ==
+                                    plugcontroller.pluglist.value[index].name) {
+                                  // return Text(box.toList()[index2]['name'].toString());
+                                  return Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      NeumorphicText(
+                                        boxobs.value[index2]['start'] +
+                                            '-' +
+                                            boxobs.value[index2]['end'],
+                                        style: NeumorphicStyle(
+                                          shape: NeumorphicShape.flat,
+                                          boxShape:
+                                              NeumorphicBoxShape.roundRect(
+                                                  BorderRadius.circular(12)),
+                                          depth: 10,
+                                          lightSource: LightSource.topLeft,
+                                          color:
+                                              boxobs.value[index2]['state'].value == 0 ?Color.fromARGB(255, 167, 167, 167) : Color.fromARGB(255, 73, 73, 73),
+                                          surfaceIntensity: 10,
+                                        ),
+                                        textStyle: NeumorphicTextStyle(
+                                          fontSize: 40,
+                                          fontWeight: FontWeight.w300,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                          width: 100,
+                                          height: 30,
+                                          child: Obx(
+                                            () => NeumorphicToggle(
+                                              selectedIndex:
+                                                  boxobs.value[index2]['state'].value,
+                                              displayForegroundOnlyIfSelected:
+                                                  true,
+                                              onChanged: (value) async {
+                                                boxobs.value[index2]['state'].value =
+                                                    value;
+                                                if (value == 1) {
+                                                  print('1check');
+                                                } else {
+                                                  print('0check');
+                                                }
+                                              },
+                                              // thumb: Neumorphic(),
+                                              thumb: Container(
+                                                color: boxobs.value[index2]['state'].value == 0 ?Color.fromARGB(255, 141, 141, 141) : Color.fromARGB(255, 154, 202, 69),
+                                              ),
+                                              children: [
+                                                ToggleElement(
+                                                    background: Center()),
+                                                ToggleElement(
+                                                    background: Center()),
+                                              ],
+                                            ),
+                                          )),
+                                    ],
+                                  );
+                                } else {
+                                  return SizedBox();
+                                }
+                              }).toList(),
+                            )
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  )),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -193,12 +506,12 @@ class Mainhome extends StatelessWidget {
                 NeumorphicText(
                   'EHR&C HVAC SYSTEM',
                   style: NeumorphicStyle(
-                    shape: NeumorphicShape.concave,
+                    shape: NeumorphicShape.flat,
                     boxShape:
                         NeumorphicBoxShape.roundRect(BorderRadius.circular(12)),
                     depth: 10,
                     lightSource: LightSource.topLeft,
-                    color: Color.fromARGB(146, 113, 114, 104),
+                    color: Color.fromARGB(146, 51, 51, 49),
                     surfaceIntensity: 10,
                   ),
                   textStyle: NeumorphicTextStyle(
@@ -224,7 +537,7 @@ class Mainhome extends StatelessWidget {
                       style: NeumorphicStyle(
                         shape: NeumorphicShape.flat,
                         boxShape: NeumorphicBoxShape.roundRect(
-                            BorderRadius.circular(30)),
+                            BorderRadius.circular(10)),
                         depth: 7,
                         lightSource: LightSource.topLeft,
                         color: plugcontroller.pluglist.value[index]
@@ -816,21 +1129,21 @@ class Datapage extends StatelessWidget {
                   Container(
                     height: 30,
                     child: NeumorphicText(
-                  'Monitoring System',
-                  style: NeumorphicStyle(
-                    shape: NeumorphicShape.flat,
-                    boxShape:
-                        NeumorphicBoxShape.roundRect(BorderRadius.circular(12)),
-                    depth: 10,
-                    lightSource: LightSource.topLeft,
-                    color: Color.fromARGB(146, 31, 31, 30),
-                    surfaceIntensity: 10,
-                  ),
-                  textStyle: NeumorphicTextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
+                      'Monitoring System',
+                      style: NeumorphicStyle(
+                        shape: NeumorphicShape.flat,
+                        boxShape: NeumorphicBoxShape.roundRect(
+                            BorderRadius.circular(12)),
+                        depth: 10,
+                        lightSource: LightSource.topLeft,
+                        color: Color.fromARGB(146, 31, 31, 30),
+                        surfaceIntensity: 10,
+                      ),
+                      textStyle: NeumorphicTextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
                   )
                 ],
               ),
@@ -847,25 +1160,26 @@ class Datapage extends StatelessWidget {
                       child: SizedBox(
                         // height: 50,
                         width: 80,
-                        child: Obx(()=>NeumorphicText(
-                                  'CO2',
-                                  style: NeumorphicStyle(
-                                    shape: NeumorphicShape.flat,
-                                    boxShape:
-                                          NeumorphicBoxShape.roundRect(BorderRadius.circular(12)),
-                                    depth: 10,
-                                    lightSource: LightSource.topLeft,
-                                    color: data_val_index.value == 'co2'? Color.fromARGB(255, 0, 173, 52) : Color.fromARGB(146, 39, 39, 37),
-                                    surfaceIntensity: 10,
-                                  ),
-                                  textStyle: NeumorphicTextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                )
+                        child: Obx(() => NeumorphicText(
+                              'CO2',
+                              style: NeumorphicStyle(
+                                shape: NeumorphicShape.flat,
+                                boxShape: NeumorphicBoxShape.roundRect(
+                                    BorderRadius.circular(12)),
+                                depth: 10,
+                                lightSource: LightSource.topLeft,
+                                color: data_val_index.value == 'co2'
+                                    ? Color.fromARGB(255, 0, 173, 52)
+                                    : Color.fromARGB(146, 39, 39, 37),
+                                surfaceIntensity: 10,
                               ),
-                            ),
-                          ),
+                              textStyle: NeumorphicTextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            )),
+                      ),
+                    ),
                     InkWell(
                       onTap: () {
                         data_val_index.value = 'pm';
@@ -873,23 +1187,24 @@ class Datapage extends StatelessWidget {
                       child: SizedBox(
                         // height: 50,
                         width: 80,
-                        child: Obx(()=>NeumorphicText(
-                                  'PM',
-                                  style: NeumorphicStyle(
-                                    shape: NeumorphicShape.flat,
-                                    boxShape:
-                                          NeumorphicBoxShape.roundRect(BorderRadius.circular(12)),
-                                    depth: 10,
-                                    lightSource: LightSource.topLeft,
-                                    color: data_val_index.value == 'pm'? Color.fromARGB(255, 0, 173, 52) : Color.fromARGB(146, 39, 39, 37),
-                                    surfaceIntensity: 10,
-                                  ),
-                                  textStyle: NeumorphicTextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                )
+                        child: Obx(() => NeumorphicText(
+                              'PM',
+                              style: NeumorphicStyle(
+                                shape: NeumorphicShape.flat,
+                                boxShape: NeumorphicBoxShape.roundRect(
+                                    BorderRadius.circular(12)),
+                                depth: 10,
+                                lightSource: LightSource.topLeft,
+                                color: data_val_index.value == 'pm'
+                                    ? Color.fromARGB(255, 0, 173, 52)
+                                    : Color.fromARGB(146, 39, 39, 37),
+                                surfaceIntensity: 10,
                               ),
+                              textStyle: NeumorphicTextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            )),
                       ),
                     ),
                     InkWell(
@@ -899,23 +1214,24 @@ class Datapage extends StatelessWidget {
                       child: SizedBox(
                         // height: 50,
                         width: 80,
-                        child: Obx(()=>NeumorphicText(
-                                  'TEMP',
-                                  style: NeumorphicStyle(
-                                    shape: NeumorphicShape.flat,
-                                    boxShape:
-                                          NeumorphicBoxShape.roundRect(BorderRadius.circular(12)),
-                                    depth: 10,
-                                    lightSource: LightSource.topLeft,
-                                    color: data_val_index.value == 'temp'? Color.fromARGB(255, 0, 173, 52) : Color.fromARGB(146, 39, 39, 37),
-                                    surfaceIntensity: 10,
-                                  ),
-                                  textStyle: NeumorphicTextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                )
+                        child: Obx(() => NeumorphicText(
+                              'TEMP',
+                              style: NeumorphicStyle(
+                                shape: NeumorphicShape.flat,
+                                boxShape: NeumorphicBoxShape.roundRect(
+                                    BorderRadius.circular(12)),
+                                depth: 10,
+                                lightSource: LightSource.topLeft,
+                                color: data_val_index.value == 'temp'
+                                    ? Color.fromARGB(255, 0, 173, 52)
+                                    : Color.fromARGB(146, 39, 39, 37),
+                                surfaceIntensity: 10,
                               ),
+                              textStyle: NeumorphicTextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            )),
                       ),
                     ),
                   ],
@@ -1071,7 +1387,8 @@ class LineChart extends StatelessWidget {
       // max = e.value['time'][-1];
       return LineSeries(
           name: e.key,
-          dataSource: List<ChartData>.generate(datamap[e.key]['time'].length, (index) {
+          dataSource:
+              List<ChartData>.generate(datamap[e.key]['time'].length, (index) {
             return ChartData(e.value['time'][index], e.value[valname][index]);
           }).toList(),
           xValueMapper: (ChartData data, _) => data.x,
@@ -1118,6 +1435,14 @@ class ChartData {
   ChartData(this.x, this.y);
   final DateTime x;
   final double y;
+}
+
+class Alarm {
+  Alarm(this.name, this.start, this.end, this.state);
+  final String name;
+  final String start;
+  final String end;
+  final int state;
 }
 
 // class Chart extends StatelessWidget {
