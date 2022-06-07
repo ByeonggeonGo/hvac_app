@@ -931,3 +931,15 @@ def mean_data():
 	return dd_dic
 
 
+
+@bp.route('/rulebase_schedule')
+def rulebase_schedule():
+	ip = request.args.get('ip')
+	user_id = request.args.get('user_id')
+	start = request.args.get('start')
+	end = request.args.get('end')
+	
+	
+	return
+
+

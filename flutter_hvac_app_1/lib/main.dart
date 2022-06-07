@@ -292,7 +292,7 @@ class Secondpage extends StatelessWidget {
                                 SizedBox(
                                   width: 100,
                                   child: NeumorphicText(
-                                    plugcontroller.pluglist.value[index].name,
+                                    plugcontroller.pluglist.value[index].name + ': '+plugcontroller.pluglist.value[index].schedule.value.toString(),
                                     style: NeumorphicStyle(
                                       shape: NeumorphicShape.flat,
                                       boxShape: NeumorphicBoxShape.roundRect(
@@ -367,9 +367,17 @@ class Secondpage extends StatelessWidget {
                                                 boxobs.value[index2]['state'].value =
                                                     value;
                                                 if (value == 1) {
-                                                  print('1check');
-                                                } else {
-                                                  print('0check');
+                                                  plugcontroller.pluglist.value[index].schedule.value = 1;
+                                                  } else {
+                                                    num testind = 0;
+                                                    for(var it = 0; it<boxobs.value.length; it++){
+                                                      if(boxobs.value[it]['name'] ==plugcontroller.pluglist.value[index].name){
+                                                        testind = testind + boxobs.value[it]['state'].value;
+                                                      }
+                                                    }
+                                                    if(testind == 0 ){
+                                                      plugcontroller.pluglist.value[index].schedule.value = 0;
+                                                    }
                                                 }
                                               },
                                               // thumb: Neumorphic(),
