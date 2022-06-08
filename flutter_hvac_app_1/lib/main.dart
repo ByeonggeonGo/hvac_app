@@ -1880,6 +1880,9 @@ class Bottombox extends StatelessWidget {
         Column(
           children: [
             Neumorphic(
+              style: page_index.value == 0 ? NeumorphicStyle(
+                color: Color.fromARGB(255, 215, 234, 255)
+              ) : null,
               child: IconButton(
                   onPressed: () {
                     page_index.value = 0;
@@ -1910,6 +1913,9 @@ class Bottombox extends StatelessWidget {
         Column(
           children: [
             Neumorphic(
+              style: page_index.value == 1 ?NeumorphicStyle(
+                color: Color.fromARGB(255, 215, 234, 255)
+              ) : null,
               child: IconButton(
                   onPressed: () {
                     page_index.value = 1;
@@ -1940,6 +1946,9 @@ class Bottombox extends StatelessWidget {
         Column(
           children: [
             Neumorphic(
+              style: page_index.value == 2 ?NeumorphicStyle(
+                color: Color.fromARGB(255, 215, 234, 255)
+              ) : null,
               child: IconButton(
                   onPressed: () {
                     page_index.value = 2;
