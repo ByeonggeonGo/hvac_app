@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:io';
 
 class PlugController extends GetxController {
   var _pluglist = [].obs;
@@ -13,12 +14,6 @@ class PlugController extends GetxController {
   String pub_ip = '222.108.71.247:51213';
 
   Map get sensor_map => _sensor_map;
-
-  
-  
-
-
-
 
   add_plug(String user_id, String ip, String name, String sensornum,
       String typeagent, String ruleset) async {
@@ -128,7 +123,6 @@ class PlugController extends GetxController {
             plug.sensornum = '${jsonDecode(Response.body)['sensornum']['$i']}';
             plug.typeagent = jsonDecode(Response.body)['type_agent']['$i'];
             plug.schedule.value = jsonDecode(Response.body)['schedule']['$i'];
-
           }
         }
       }
@@ -140,7 +134,7 @@ class PlugController extends GetxController {
         headers: {"Access-Control_Allow_Origin": "*"}).then((Response) {
       if (Response.statusCode == 200) {
         sensor_data.add(jsonDecode(Response.body));
-        
+
         // print(sensor_data.value[0]['거실']);
         sensor_data.value[0].forEach((k, v) {
           _sensor_map[k] = {
@@ -242,5 +236,20 @@ class SmartPlug extends GetxController {
         headers: {"Access-Control_Allow_Origin": "*"}).then((Response) {
       Response.statusCode == 200 ? print('ok루프시작') : null;
     });
+  }
+}
+
+class LoginController extends GetxController {
+  var login_index = 0.obs;
+  RxDouble op = 0.001.obs;
+  adt_opc() async {
+    int i = 0;
+    while (i < 100) {
+      i++;
+      op.value = i / 100;
+      sleep(const Duration(milliseconds: 10));
+    }
+    login_index.value = 1;
+    print(login_index.value);
   }
 }

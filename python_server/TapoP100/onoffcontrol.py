@@ -934,12 +934,28 @@ def mean_data():
 
 @bp.route('/rulebase_schedule')
 def rulebase_schedule():
+
 	ip = request.args.get('ip')
 	user_id = request.args.get('user_id')
 	start = request.args.get('start')
 	end = request.args.get('end')
-	
-	
-	return
+	state = request.args.get('state')
+
+	path = os.getcwd()
+	tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+
+	if state == 'on':
+		tt.loc[tt.ip == ip,['schedule']] = 1
+		tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
+
+	elif state == 'off':
+		tt.loc[tt.ip == ip,['schedule']] = 0
+		tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
+
+	return 'ok'
+
+def job():
+	print("task")
+
 
 

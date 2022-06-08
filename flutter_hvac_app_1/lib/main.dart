@@ -8,8 +8,10 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_charts/sparkcharts.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 final plugcontroller = PlugController();
+final logincontroller = LoginController();
 var page_index = 0.obs;
 var data_val_index = 'co2'.obs;
 var user_id = 'ehrnc';
@@ -27,6 +29,7 @@ Map sensor_info = {
 };
 var box;
 RxList boxobs = [].obs;
+
 void main() async {
   plugcontroller.set_plug_list(user_id);
   plugcontroller.load_data();
@@ -48,7 +51,10 @@ void main() async {
     };
     return alarmdata;
   }).toList();
-  runApp(GetMaterialApp(home: Home()));
+  runApp(GetMaterialApp(
+    home: Home(),
+    theme: ThemeData(fontFamily: 'NanumGothic'),
+  ));
 }
 
 class Home extends StatelessWidget {
@@ -56,7 +62,80 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Home_page();
+    // return Home_page();
+    return Obx(() =>
+        logincontroller.login_index.value == 0 ? Login_page() : Home_page());
+  }
+}
+
+class Login_page extends StatelessWidget {
+  const Login_page({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    // imagecontroller.adt_opc();
+    return Scaffold(
+        resizeToAvoidBottomInset: false,
+        body: Container(
+          decoration: BoxDecoration(
+              // color: Color.fromARGB(255, 209, 155, 155),
+              image: DecorationImage(
+                  colorFilter: ColorFilter.mode(
+                      Colors.white.withOpacity(1), BlendMode.dstATop),
+                  fit: BoxFit.fitHeight,
+                  image: AssetImage('images/loginpage_base.png'))),
+          // color: Colors.white,
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          alignment: Alignment(0.0, 0.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Text(
+              //   'HVAC System',
+              //   style: TextStyle(fontFamily: 'RobotoMono', fontWeight: FontWeight.w700, fontSize: 20),
+              // ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(30, 10, 30, 0),
+                child: TextFormField(
+                  decoration: const InputDecoration(
+                    hintText: 'ehrnc@ehrnc.com',
+                    labelText: '아이디',
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(30, 10, 30, 0),
+                child: TextFormField(
+                  decoration: const InputDecoration(
+                    // hintText: 'ehrnc@ehrnc.com',
+                    labelText: '비밀번호',
+                  ),
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  TextButton(onPressed: () {}, child: Text('회원가입')),
+                  TextButton(
+                      onPressed: () {
+                        logincontroller.adt_opc();
+                      },
+                      child: Text('로그인')),
+                ],
+              ),
+              // IconButton(
+              //   onPressed: () {
+              //     logincontroller.adt_opc();
+              //     // login_index.value = 1;
+              //   },
+              //   icon: Icon(Icons.abc),
+              // ),
+            ],
+          ),
+        ));
   }
 }
 
@@ -66,20 +145,31 @@ class Home_page extends StatelessWidget {
   }) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return Obx(() => Scaffold(
-          backgroundColor: NeumorphicTheme.baseColor(context),
-          // appBar: AppBar(
-          //   toolbarHeight: page_index == 0 ? 100 : 0,
-          //   backgroundColor: Colors.white,
-          // ),
-          body: page_index == 0
-              ? Mainhome()
-              : page_index == 1
-                  ? Secondpage()
-                  : Datapage(),
-          bottomNavigationBar: Container(
-            height: 70,
-            child: Bottombox(),
+    return Obx(() => Container(
+          decoration: BoxDecoration(
+              // color: Color.fromARGB(255, 209, 155, 155),
+              image: DecorationImage(
+                  colorFilter: ColorFilter.mode(
+                      Colors.white.withOpacity(1), BlendMode.dstATop),
+                  fit: BoxFit.fitHeight,
+                  image: AssetImage('images/backgroundbase.png'))),
+          child: Scaffold(
+            // backgroundColor: NeumorphicTheme.baseColor(context),
+            backgroundColor: Colors.transparent,
+            // backgroundColor: Color.fromARGB(255, 255, 255, 255),
+            // appBar: AppBar(
+            //   toolbarHeight: page_index == 0 ? 100 : 0,
+            //   backgroundColor: Colors.white,
+            // ),
+            body: page_index == 0
+                ? Mainhome()
+                : page_index == 1
+                    ? Secondpage()
+                    : Datapage(),
+            bottomNavigationBar: Container(
+              height: 70,
+              child: Bottombox(),
+            ),
           ),
         ));
   }
@@ -94,247 +184,249 @@ class Secondpage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: SizedBox(
-        height: 600,
-        child: Column(
-          // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(
-              height: 70,
+      child: Column(
+        // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(
+            height: 70,
+          ),
+          Neumorphic(
+            // height: 70,
+            // color: Color.fromARGB(255, 255, 255, 255),
+            margin: EdgeInsets.all(10),
+            padding: EdgeInsets.all(4),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Container(
+                  // height: 30,
+                  child: NeumorphicText(
+                    'Schedule',
+                    style: NeumorphicStyle(
+                      shape: NeumorphicShape.flat,
+                      boxShape: NeumorphicBoxShape.roundRect(
+                          BorderRadius.circular(12)),
+                      depth: 10,
+                      lightSource: LightSource.topLeft,
+                      color: Color.fromARGB(146, 31, 31, 30),
+                      surfaceIntensity: 10,
+                    ),
+                    textStyle: NeumorphicTextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ],
             ),
-            Neumorphic(
-              // height: 70,
-              // color: Color.fromARGB(255, 255, 255, 255),
-              margin: EdgeInsets.all(10),
-              padding: EdgeInsets.all(4),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Container(
-                    // height: 30,
-                    child: NeumorphicText(
-                      'Schedule',
+          ),
+          Flexible(
+            fit: FlexFit.tight,
+            // plugcontroller.pluglist.value
+            child: Obx(() => ListView(
+                  children: List<Widget>.generate(
+                      plugcontroller.pluglist.value.length, (index) {
+                    return Neumorphic(
                       style: NeumorphicStyle(
                         shape: NeumorphicShape.flat,
                         boxShape: NeumorphicBoxShape.roundRect(
-                            BorderRadius.circular(12)),
-                        depth: 10,
+                            BorderRadius.circular(10)),
+                        depth: 7,
                         lightSource: LightSource.topLeft,
-                        color: Color.fromARGB(146, 31, 31, 30),
+                        color: plugcontroller.pluglist.value[index]
+                                    .rulebasestate.value ==
+                                0
+                            ? Color.fromARGB(146, 197, 199, 185)
+                            : Color.fromARGB(255, 255, 255, 255),
+                        shadowDarkColor: Color.fromARGB(170, 0, 0, 0),
+                        shadowLightColor: Color.fromARGB(255, 255, 255, 255),
                         surfaceIntensity: 10,
                       ),
-                      textStyle: NeumorphicTextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Flexible(
-              fit: FlexFit.tight,
-              // plugcontroller.pluglist.value
-              child: Obx(() => ListView(
-                    children: List<Widget>.generate(
-                        plugcontroller.pluglist.value.length, (index) {
-                      return Neumorphic(
-                        style: NeumorphicStyle(
-                          shape: NeumorphicShape.flat,
-                          boxShape: NeumorphicBoxShape.roundRect(
-                              BorderRadius.circular(10)),
-                          depth: 7,
-                          lightSource: LightSource.topLeft,
-                          color: plugcontroller.pluglist.value[index]
-                                      .rulebasestate.value ==
-                                  0
-                              ? Color.fromARGB(146, 197, 199, 185)
-                              : Color.fromARGB(146, 148, 160, 82),
-                          shadowDarkColor: Color.fromARGB(170, 0, 0, 0),
-                          shadowLightColor: Color.fromARGB(255, 255, 255, 255),
-                          surfaceIntensity: 10,
-                        ),
-                        // color: Color.fromARGB(255, 212, 212, 212),
-                        // height: 200,
-                        margin: EdgeInsets.all(10),
-                        // padding: EdgeInsets.all(4),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Flexible(
-                                  flex: 1,
-                                  child: IconButton(
-                                    icon: Icon(Icons.add_box_outlined),
-                                    onPressed: () async {
-                                      // Box box = await Hive.openBox('alarm_db');
-                                      // await box.clear();
-                                      String name = plugcontroller
-                                          .pluglist.value[index].name;
-                                      String start = '09';
-                                      String end = '15';
-                                      int state = 0;
-                                      // print(box.getAt(8));
-                                      // print(box.getAt(1));
-                                      print(box.keys);
-                                      print(box.values);
-                                      // print(box.values.toList()[0]);
-                                      Get.dialog(AlertDialog(
-                                        title: const Text('Schedule'),
-                                        content: const Text('추가 정보를 입력하세요.'),
-                                        actions: [
-                                          Container(
-                                              height: 300,
-                                              child: SingleChildScrollView(
-                                                  child: Column(
-                                                children: [
-                                                  SizedBox(
-                                                    height: 50,
-                                                    child: TextField(
-                                                      decoration: const InputDecoration(
-                                                          border:
-                                                              OutlineInputBorder(),
-                                                          hintText:
-                                                              'Start_time_ex: 09'),
-                                                      onChanged: (value) {
-                                                        start = value;
-                                                      },
-                                                    ),
-                                                  ),
-                                                  SizedBox(
-                                                    height: 50,
-                                                    child: TextField(
-                                                      decoration: const InputDecoration(
-                                                          border:
-                                                              OutlineInputBorder(),
-                                                          hintText:
-                                                              'End_time_ex: 14'),
-                                                      onChanged: (value) {
-                                                        end = value;
-                                                      },
-                                                    ),
-                                                  ),
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      List<String> check_list =
-                                                          [
-                                                        '00',
-                                                        '01',
-                                                        '02',
-                                                        '03',
-                                                        '04',
-                                                        '05',
-                                                        '06',
-                                                        '07',
-                                                        '08',
-                                                        '09',
-                                                        '10',
-                                                        '11',
-                                                        '12',
-                                                        '13',
-                                                        '14',
-                                                        '15',
-                                                        '16',
-                                                        '17',
-                                                        '18',
-                                                        '19',
-                                                        '20',
-                                                        '21',
-                                                        '22',
-                                                        '23',
-                                                        '24',
-                                                      ];
-                                                      if (check_list
-                                                              .contains(start) &
-                                                          check_list
-                                                              .contains(end)) {
-                                                        Map alarm = {
-                                                          'name': name,
-                                                          'start': start,
-                                                          'end': end,
-                                                          'state': state,
-                                                        };
-                                                        box.add(alarm);
-                                                        boxobs.value = box
-                                                            .values
-                                                            .toList()
-                                                            .map((e) {
-                                                          RxInt rxstate = 0.obs;
-                                                          rxstate.value =
-                                                              e['state'];
-                                                          Map alarmdata = {
-                                                            'name': e['name'],
-                                                            'start': e['start'],
-                                                            'end': e['end'],
-                                                            'state': rxstate,
-                                                          };
-                                                          return alarmdata;
-                                                        }).toList();
-                                                        Get.back();
-                                                      } else {
-                                                        AlertDialog(
-                                                          title: const Text(
-                                                              '시간 양식이 맞지 않습니다.'),
-                                                        );
-                                                      }
+                      // color: Color.fromARGB(255, 212, 212, 212),
+                      // height: 200,
+                      margin: EdgeInsets.all(10),
+                      // padding: EdgeInsets.all(4),
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Flexible(
+                                flex: 1,
+                                child: IconButton(
+                                  icon: Icon(Icons.add_box_outlined),
+                                  onPressed: () async {
+                                    // Box box = await Hive.openBox('alarm_db');
+                                    // await box.clear();
+                                    String name = plugcontroller
+                                        .pluglist.value[index].name;
+                                    String start = '09';
+                                    String end = '15';
+                                    int state = 0;
+                                    // print(box.getAt(8));
+                                    // print(box.getAt(1));
+                                    print(box.keys);
+                                    print(box.values);
+                                    // print(box.values.toList()[0]);
+                                    Get.dialog(AlertDialog(
+                                      title: const Text('Schedule'),
+                                      content: const Text('추가 정보를 입력하세요.'),
+                                      actions: [
+                                        Container(
+                                            height: 300,
+                                            child: SingleChildScrollView(
+                                                child: Column(
+                                              children: [
+                                                SizedBox(
+                                                  height: 50,
+                                                  child: TextField(
+                                                    decoration: const InputDecoration(
+                                                        border:
+                                                            OutlineInputBorder(),
+                                                        hintText:
+                                                            'Start_time_ex: 09'),
+                                                    onChanged: (value) {
+                                                      start = value;
                                                     },
-                                                    child: const Text("추가"),
                                                   ),
-                                                ],
-                                              )))
-                                        ],
-                                      ));
-                                    },
+                                                ),
+                                                SizedBox(
+                                                  height: 50,
+                                                  child: TextField(
+                                                    decoration: const InputDecoration(
+                                                        border:
+                                                            OutlineInputBorder(),
+                                                        hintText:
+                                                            'End_time_ex: 14'),
+                                                    onChanged: (value) {
+                                                      end = value;
+                                                    },
+                                                  ),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () {
+                                                    List<String> check_list = [
+                                                      '00',
+                                                      '01',
+                                                      '02',
+                                                      '03',
+                                                      '04',
+                                                      '05',
+                                                      '06',
+                                                      '07',
+                                                      '08',
+                                                      '09',
+                                                      '10',
+                                                      '11',
+                                                      '12',
+                                                      '13',
+                                                      '14',
+                                                      '15',
+                                                      '16',
+                                                      '17',
+                                                      '18',
+                                                      '19',
+                                                      '20',
+                                                      '21',
+                                                      '22',
+                                                      '23',
+                                                      '24',
+                                                    ];
+                                                    if (check_list
+                                                            .contains(start) &
+                                                        check_list
+                                                            .contains(end)) {
+                                                      Map alarm = {
+                                                        'name': name,
+                                                        'start': start,
+                                                        'end': end,
+                                                        'state': state,
+                                                      };
+                                                      box.add(alarm);
+                                                      boxobs.value = box.values
+                                                          .toList()
+                                                          .map((e) {
+                                                        RxInt rxstate = 0.obs;
+                                                        rxstate.value =
+                                                            e['state'];
+                                                        Map alarmdata = {
+                                                          'name': e['name'],
+                                                          'start': e['start'],
+                                                          'end': e['end'],
+                                                          'state': rxstate,
+                                                        };
+                                                        return alarmdata;
+                                                      }).toList();
+                                                      Get.back();
+                                                    } else {
+                                                      AlertDialog(
+                                                        title: const Text(
+                                                            '시간 양식이 맞지 않습니다.'),
+                                                      );
+                                                    }
+                                                  },
+                                                  child: const Text("추가"),
+                                                ),
+                                              ],
+                                            )))
+                                      ],
+                                    ));
+                                  },
+                                ),
+                              ),
+                              SizedBox(
+                                width: 100,
+                                child: NeumorphicText(
+                                  plugcontroller.pluglist.value[index].name +
+                                      ': ' +
+                                      plugcontroller
+                                          .pluglist.value[index].schedule.value
+                                          .toString(),
+                                  style: NeumorphicStyle(
+                                    shape: NeumorphicShape.flat,
+                                    boxShape: NeumorphicBoxShape.roundRect(
+                                        BorderRadius.circular(12)),
+                                    depth: 10,
+                                    lightSource: LightSource.top,
+                                    color: Color.fromARGB(146, 41, 41, 41),
+                                    surfaceIntensity: 10,
+                                  ),
+                                  textStyle: NeumorphicTextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                                SizedBox(
-                                  width: 100,
-                                  child: NeumorphicText(
-                                    plugcontroller.pluglist.value[index].name + ': '+plugcontroller.pluglist.value[index].schedule.value.toString(),
-                                    style: NeumorphicStyle(
-                                      shape: NeumorphicShape.flat,
-                                      boxShape: NeumorphicBoxShape.roundRect(
-                                          BorderRadius.circular(12)),
-                                      depth: 10,
-                                      lightSource: LightSource.top,
-                                      color: Color.fromARGB(146, 41, 41, 41),
-                                      surfaceIntensity: 10,
-                                    ),
-                                    textStyle: NeumorphicTextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
+                              ),
+                              Flexible(
+                                flex: 1,
+                                child: SizedBox(
+                                  width: 30,
                                 ),
-                                Flexible(
-                                  flex: 1,
-                                  child: SizedBox(
-                                    width: 30,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Container(
-                              height: 2,
-                              color: Color.fromARGB(31, 36, 35, 35),
-                            ),
-                            Column(
-                              // children: [Text(box.values.toList().toString())],
-                              children: List<Widget>.generate(
-                                  boxobs.value.length, (index2) {
-                                if (boxobs.value[index2]['name'] ==
-                                    plugcontroller.pluglist.value[index].name) {
-                                  // return Text(box.toList()[index2]['name'].toString());
-                                  return Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      NeumorphicText(
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Container(
+                            height: 2,
+                            color: Color.fromARGB(31, 36, 35, 35),
+                          ),
+                          Column(
+                            // children: [Text(box.values.toList().toString())],
+                            children: List<Widget>.generate(boxobs.value.length,
+                                (index2) {
+                              if (boxobs.value[index2]['name'] ==
+                                  plugcontroller.pluglist.value[index].name) {
+                                // return Text(box.toList()[index2]['name'].toString());
+                                return Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          20, 2, 50, 2),
+                                      child: NeumorphicText(
                                         boxobs.value[index2]['start'] +
                                             '-' +
                                             boxobs.value[index2]['end'],
@@ -345,8 +437,12 @@ class Secondpage extends StatelessWidget {
                                                   BorderRadius.circular(12)),
                                           depth: 10,
                                           lightSource: LightSource.topLeft,
-                                          color:
-                                              boxobs.value[index2]['state'].value == 0 ?Color.fromARGB(255, 167, 167, 167) : Color.fromARGB(255, 73, 73, 73),
+                                          color: boxobs.value[index2]['state']
+                                                      .value ==
+                                                  0
+                                              ? Color.fromARGB(
+                                                  255, 167, 167, 167)
+                                              : Color.fromARGB(255, 73, 73, 73),
                                           surfaceIntensity: 10,
                                         ),
                                         textStyle: NeumorphicTextStyle(
@@ -354,59 +450,103 @@ class Secondpage extends StatelessWidget {
                                           fontWeight: FontWeight.w300,
                                         ),
                                       ),
-                                      SizedBox(
-                                          width: 100,
-                                          height: 30,
-                                          child: Obx(
-                                            () => NeumorphicToggle(
-                                              selectedIndex:
-                                                  boxobs.value[index2]['state'].value,
-                                              displayForegroundOnlyIfSelected:
-                                                  true,
-                                              onChanged: (value) async {
-                                                boxobs.value[index2]['state'].value =
-                                                    value;
-                                                if (value == 1) {
-                                                  plugcontroller.pluglist.value[index].schedule.value = 1;
-                                                  } else {
-                                                    num testind = 0;
-                                                    for(var it = 0; it<boxobs.value.length; it++){
-                                                      if(boxobs.value[it]['name'] ==plugcontroller.pluglist.value[index].name){
-                                                        testind = testind + boxobs.value[it]['state'].value;
-                                                      }
-                                                    }
-                                                    if(testind == 0 ){
-                                                      plugcontroller.pluglist.value[index].schedule.value = 0;
-                                                    }
+                                    ),
+                                    SizedBox(
+                                        width: 100,
+                                        height: 30,
+                                        child: Obx(
+                                          () => NeumorphicToggle(
+                                            selectedIndex: boxobs
+                                                .value[index2]['state'].value,
+                                            displayForegroundOnlyIfSelected:
+                                                true,
+                                            onChanged: (value) async {
+                                              boxobs.value[index2]['state']
+                                                  .value = value;
+                                              if (value == 1) {
+                                                plugcontroller
+                                                    .pluglist
+                                                    .value[index]
+                                                    .schedule
+                                                    .value = 1;
+                                              } else {
+                                                num testind = 0;
+                                                for (var it = 0;
+                                                    it < boxobs.value.length;
+                                                    it++) {
+                                                  if (boxobs.value[it]
+                                                          ['name'] ==
+                                                      plugcontroller.pluglist
+                                                          .value[index].name) {
+                                                    testind = testind +
+                                                        boxobs
+                                                            .value[it]['state']
+                                                            .value;
+                                                  }
                                                 }
-                                              },
-                                              // thumb: Neumorphic(),
-                                              thumb: Container(
-                                                color: boxobs.value[index2]['state'].value == 0 ?Color.fromARGB(255, 141, 141, 141) : Color.fromARGB(255, 154, 202, 69),
-                                              ),
-                                              children: [
-                                                ToggleElement(
-                                                    background: Center()),
-                                                ToggleElement(
-                                                    background: Center()),
-                                              ],
+                                                if (testind == 0) {
+                                                  plugcontroller
+                                                      .pluglist
+                                                      .value[index]
+                                                      .schedule
+                                                      .value = 0;
+                                                }
+                                              }
+                                            },
+                                            // thumb: Neumorphic(),
+                                            thumb: Container(
+                                              color: boxobs
+                                                          .value[index2]
+                                                              ['state']
+                                                          .value ==
+                                                      0
+                                                  ? Color.fromARGB(
+                                                      255, 141, 141, 141)
+                                                  : Color.fromARGB(
+                                                      255, 220, 225, 238),
                                             ),
-                                          )),
-                                    ],
-                                  );
-                                } else {
-                                  return SizedBox();
-                                }
-                              }).toList(),
-                            )
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                  )),
-            )
-          ],
-        ),
+                                            children: [
+                                              ToggleElement(
+                                                  background: Center()),
+                                              ToggleElement(
+                                                  background: Center()),
+                                            ],
+                                          ),
+                                        )),
+                                    IconButton(
+                                        onPressed: () {
+                                          box.deleteAt(index2);
+                                          boxobs.value =
+                                              box.values.toList().map((e) {
+                                            RxInt rxstate = 0.obs;
+                                            rxstate.value = e['state'];
+                                            Map alarmdata = {
+                                              'name': e['name'],
+                                              'start': e['start'],
+                                              'end': e['end'],
+                                              'state': rxstate,
+                                            };
+                                            return alarmdata;
+                                          }).toList();
+                                        },
+                                        icon: Icon(
+                                          Icons.remove_circle_outline,
+                                          size: 20,
+                                        )),
+                                  ],
+                                );
+                              } else {
+                                return SizedBox();
+                              }
+                            }).toList(),
+                          )
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                )),
+          )
+        ],
       ),
     );
   }
@@ -552,7 +692,7 @@ class Mainhome extends StatelessWidget {
                                     .rulebasestate.value ==
                                 0
                             ? Color.fromARGB(146, 197, 199, 185)
-                            : Color.fromARGB(146, 148, 160, 82),
+                            : Color.fromARGB(255, 255, 255, 255),
                         shadowDarkColor: Color.fromARGB(170, 0, 0, 0),
                         shadowLightColor: Color.fromARGB(255, 255, 255, 255),
                         surfaceIntensity: 10,
@@ -1118,7 +1258,7 @@ class Datapage extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: SizedBox(
-        height: 600,
+        height: MediaQuery.of(context).size.height * 0.9,
         child: Column(
           // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1135,9 +1275,9 @@ class Datapage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Container(
-                    height: 30,
+                    // height: 30,
                     child: NeumorphicText(
-                      'Monitoring System',
+                      'Monitoring system',
                       style: NeumorphicStyle(
                         shape: NeumorphicShape.flat,
                         boxShape: NeumorphicBoxShape.roundRect(
@@ -1152,118 +1292,574 @@ class Datapage extends StatelessWidget {
                         fontWeight: FontWeight.w800,
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
-            Flexible(
-                flex: 1,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        data_val_index.value = 'co2';
-                      },
-                      child: SizedBox(
-                        // height: 50,
-                        width: 80,
-                        child: Obx(() => NeumorphicText(
-                              'CO2',
-                              style: NeumorphicStyle(
-                                shape: NeumorphicShape.flat,
-                                boxShape: NeumorphicBoxShape.roundRect(
-                                    BorderRadius.circular(12)),
-                                depth: 10,
-                                lightSource: LightSource.topLeft,
-                                color: data_val_index.value == 'co2'
-                                    ? Color.fromARGB(255, 0, 173, 52)
-                                    : Color.fromARGB(146, 39, 39, 37),
-                                surfaceIntensity: 10,
-                              ),
-                              textStyle: NeumorphicTextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            )),
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () {
-                        data_val_index.value = 'pm';
-                      },
-                      child: SizedBox(
-                        // height: 50,
-                        width: 80,
-                        child: Obx(() => NeumorphicText(
-                              'PM',
-                              style: NeumorphicStyle(
-                                shape: NeumorphicShape.flat,
-                                boxShape: NeumorphicBoxShape.roundRect(
-                                    BorderRadius.circular(12)),
-                                depth: 10,
-                                lightSource: LightSource.topLeft,
-                                color: data_val_index.value == 'pm'
-                                    ? Color.fromARGB(255, 0, 173, 52)
-                                    : Color.fromARGB(146, 39, 39, 37),
-                                surfaceIntensity: 10,
-                              ),
-                              textStyle: NeumorphicTextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            )),
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () {
-                        data_val_index.value = 'temp';
-                      },
-                      child: SizedBox(
-                        // height: 50,
-                        width: 80,
-                        child: Obx(() => NeumorphicText(
-                              'TEMP',
-                              style: NeumorphicStyle(
-                                shape: NeumorphicShape.flat,
-                                boxShape: NeumorphicBoxShape.roundRect(
-                                    BorderRadius.circular(12)),
-                                depth: 10,
-                                lightSource: LightSource.topLeft,
-                                color: data_val_index.value == 'temp'
-                                    ? Color.fromARGB(255, 0, 173, 52)
-                                    : Color.fromARGB(146, 39, 39, 37),
-                                surfaceIntensity: 10,
-                              ),
-                              textStyle: NeumorphicTextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            )),
-                      ),
-                    ),
-                  ],
-                )),
-            SizedBox(
-              height: 30,
-            ),
-            Flexible(
-                flex: 4,
-                fit: FlexFit.tight,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    child: Obx(
-                      () => plugcontroller.dataset_index.value == 0
-                          ? Text('로딩중...')
-                          : LineChart(
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 1, 16, 16),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Obx(
+                  () => plugcontroller.dataset_index.value == 0
+                      ? Container(
+                          height: MediaQuery.of(context).size.height * 0.5,
+                          width: MediaQuery.of(context).size.width,
+                          alignment: const Alignment(0.0, 0.0),
+                          child: SpinKitFadingCircle(
+                            color: Colors.white,
+                            size: 50.0,
+                          ),
+                        )
+                      : Column(
+                          children: [
+                            Neumorphic(
+                                style: NeumorphicStyle(
+                                  shape: NeumorphicShape.flat,
+                                  boxShape: NeumorphicBoxShape.roundRect(
+                                      BorderRadius.circular(10)),
+                                  depth: 7,
+                                  lightSource: LightSource.topLeft,
+                                  color: Color.fromARGB(146, 197, 199, 185),
+                                  shadowDarkColor: Color.fromARGB(170, 0, 0, 0),
+                                  shadowLightColor:
+                                      Color.fromARGB(255, 255, 255, 255),
+                                  surfaceIntensity: 10,
+                                ),
+                                // color: Color.fromARGB(255, 212, 212, 212),
+                                // height: 200,
+                                margin: EdgeInsets.all(10),
+                                // padding: EdgeInsets.all(4),
+                                child: Container(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.15,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.9,
+                                  color: Color.fromARGB(153, 206, 214, 240),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: const Icon(
+                                              Icons.snowing,
+                                              color: Colors.black,
+                                              size: 20,
+                                            ),
+                                          ),
+                                          NeumorphicText(
+                                            '실내공기질',
+                                            style: NeumorphicStyle(
+                                              shape: NeumorphicShape.flat,
+                                              boxShape:
+                                                  NeumorphicBoxShape.roundRect(
+                                                      BorderRadius.circular(
+                                                          12)),
+                                              // depth: 10,
+                                              // lightSource: LightSource.top,
+                                              color:
+                                                  Color.fromARGB(255, 7, 7, 7),
+                                              surfaceIntensity: 10,
+                                            ),
+                                            textStyle: NeumorphicTextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w300,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Flexible(
+                                        fit: FlexFit.tight,
+                                        child: Row(
+                                          // crossAxisAlignment: CrossAxisAlignment.stretch,
+                                          children: [
+                                            Flexible(
+                                              fit: FlexFit.tight,
+                                              flex: 1,
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  color: Color.fromARGB(255, 255, 255, 255),
+                                                  border: Border.all(
+                                                    color: Color.fromARGB(
+                                                        255, 190, 190, 190),
+                                                    width: 0.3,
+                                                  ),
+                                                  // borderRadius: BorderRadius.circular(3),
+                                                ),
+                                                padding: EdgeInsets.all(6),
+                                                // color: Color.fromARGB(159, 217, 232, 233),
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    NeumorphicText(
+                                                      '이산화탄소',
+                                                      style: NeumorphicStyle(
+                                                        shape: NeumorphicShape
+                                                            .flat,
+                                                        boxShape:
+                                                            NeumorphicBoxShape
+                                                                .roundRect(
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            12)),
+                                                        // depth: 10,
+                                                        // lightSource: LightSource.top,
+                                                        color: Color.fromARGB(
+                                                            255, 7, 7, 7),
+                                                        surfaceIntensity: 10,
+                                                      ),
+                                                      textStyle:
+                                                          NeumorphicTextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w300,
+                                                      ),
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        NeumorphicText(
+                                                          plugcontroller
+                                                              .sensor_map['평균']
+                                                                  ['co2']
+                                                              .last
+                                                              .toString(),
+                                                          style:
+                                                              NeumorphicStyle(
+                                                            shape:
+                                                                NeumorphicShape
+                                                                    .flat,
+                                                            boxShape: NeumorphicBoxShape
+                                                                .roundRect(
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            12)),
+                                                            // depth: 10,
+                                                            // lightSource: LightSource.top,
+                                                            color:
+                                                                Color.fromARGB(
+                                                                    255,
+                                                                    7,
+                                                                    7,
+                                                                    7),
+                                                            surfaceIntensity:
+                                                                10,
+                                                          ),
+                                                          textStyle:
+                                                              NeumorphicTextStyle(
+                                                            fontSize: 20,
+                                                            fontWeight:
+                                                                FontWeight.w300,
+                                                          ),
+                                                        ),
+                                                        NeumorphicText(
+                                                          ' ppm',
+                                                          style:
+                                                              NeumorphicStyle(
+                                                            shape:
+                                                                NeumorphicShape
+                                                                    .flat,
+                                                            boxShape: NeumorphicBoxShape
+                                                                .roundRect(
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            12)),
+                                                            // depth: 10,
+                                                            // lightSource: LightSource.top,
+                                                            color:
+                                                                Color.fromARGB(
+                                                                    255,
+                                                                    7,
+                                                                    7,
+                                                                    7),
+                                                            surfaceIntensity:
+                                                                10,
+                                                          ),
+                                                          textStyle:
+                                                              NeumorphicTextStyle(
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight.w300,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            Flexible(
+                                              fit: FlexFit.tight,
+                                              flex: 1,
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  color: Color.fromARGB(255, 255, 255, 255),
+                                                  border: Border.all(
+                                                    color: Color.fromARGB(
+                                                        255, 190, 190, 190),
+                                                    width: 0.3,
+                                                  ),
+                                                  // borderRadius: BorderRadius.circular(3),
+                                                ),
+                                                padding: EdgeInsets.all(6),
+                                                // color: Color.fromARGB(159, 217, 232, 233),
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    NeumorphicText(
+                                                      '미세먼지',
+                                                      style: NeumorphicStyle(
+                                                        shape: NeumorphicShape
+                                                            .flat,
+                                                        boxShape:
+                                                            NeumorphicBoxShape
+                                                                .roundRect(
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            12)),
+                                                        // depth: 10,
+                                                        // lightSource: LightSource.top,
+                                                        color: Color.fromARGB(
+                                                            255, 0, 0, 0),
+                                                        surfaceIntensity: 10,
+                                                      ),
+                                                      textStyle:
+                                                          NeumorphicTextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w300,
+                                                      ),
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        NeumorphicText(
+                                                          plugcontroller
+                                                              .sensor_map['평균']
+                                                                  ['pm']
+                                                              .last
+                                                              .toString(),
+                                                          style:
+                                                              NeumorphicStyle(
+                                                            shape:
+                                                                NeumorphicShape
+                                                                    .flat,
+                                                            boxShape: NeumorphicBoxShape
+                                                                .roundRect(
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            12)),
+                                                            // depth: 10,
+                                                            // lightSource: LightSource.top,
+                                                            color:
+                                                                Color.fromARGB(
+                                                                    255,
+                                                                    7,
+                                                                    7,
+                                                                    7),
+                                                            surfaceIntensity:
+                                                                10,
+                                                          ),
+                                                          textStyle:
+                                                              NeumorphicTextStyle(
+                                                            fontSize: 20,
+                                                            fontWeight:
+                                                                FontWeight.w300,
+                                                          ),
+                                                        ),
+                                                        NeumorphicText(
+                                                          ' ppm',
+                                                          style:
+                                                              NeumorphicStyle(
+                                                            shape:
+                                                                NeumorphicShape
+                                                                    .flat,
+                                                            boxShape: NeumorphicBoxShape
+                                                                .roundRect(
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            12)),
+                                                            // depth: 10,
+                                                            // lightSource: LightSource.top,
+                                                            color:
+                                                                Color.fromARGB(
+                                                                    255,
+                                                                    7,
+                                                                    7,
+                                                                    7),
+                                                            surfaceIntensity:
+                                                                10,
+                                                          ),
+                                                          textStyle:
+                                                              NeumorphicTextStyle(
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight.w300,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            Flexible(
+                                              fit: FlexFit.tight,
+                                              flex: 1,
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  color: Color.fromARGB(255, 255, 255, 255),
+                                                  border: Border.all(
+                                                    color: Color.fromARGB(
+                                                        255, 190, 190, 190),
+                                                    width: 0.3,
+                                                  ),
+                                                  // borderRadius: BorderRadius.circular(3),
+                                                ),
+                                                padding: EdgeInsets.all(6),
+                                                // color: Color.fromARGB(159, 217, 232, 233),
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    NeumorphicText(
+                                                      '기온',
+                                                      style: NeumorphicStyle(
+                                                        shape: NeumorphicShape
+                                                            .flat,
+                                                        boxShape:
+                                                            NeumorphicBoxShape
+                                                                .roundRect(
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            12)),
+                                                        // depth: 10,
+                                                        // lightSource: LightSource.top,
+                                                        color: Color.fromARGB(
+                                                            255, 7, 7, 7),
+                                                        surfaceIntensity: 10,
+                                                      ),
+                                                      textStyle:
+                                                          NeumorphicTextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w300,
+                                                      ),
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        NeumorphicText(
+                                                          plugcontroller
+                                                              .sensor_map['평균']
+                                                                  ['temp']
+                                                              .last
+                                                              .toString(),
+                                                          style:
+                                                              NeumorphicStyle(
+                                                            shape:
+                                                                NeumorphicShape
+                                                                    .flat,
+                                                            boxShape: NeumorphicBoxShape
+                                                                .roundRect(
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            12)),
+                                                            // depth: 10,
+                                                            // lightSource: LightSource.top,
+                                                            color:
+                                                                Color.fromARGB(
+                                                                    255,
+                                                                    7,
+                                                                    7,
+                                                                    7),
+                                                            surfaceIntensity:
+                                                                10,
+                                                          ),
+                                                          textStyle:
+                                                              NeumorphicTextStyle(
+                                                            fontSize: 20,
+                                                            fontWeight:
+                                                                FontWeight.w300,
+                                                          ),
+                                                        ),
+                                                        NeumorphicText(
+                                                          ' °C',
+                                                          style:
+                                                              NeumorphicStyle(
+                                                            shape:
+                                                                NeumorphicShape
+                                                                    .flat,
+                                                            boxShape: NeumorphicBoxShape
+                                                                .roundRect(
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            12)),
+                                                            // depth: 10,
+                                                            // lightSource: LightSource.top,
+                                                            color:
+                                                                Color.fromARGB(
+                                                                    255,
+                                                                    7,
+                                                                    7,
+                                                                    7),
+                                                            surfaceIntensity:
+                                                                10,
+                                                          ),
+                                                          textStyle:
+                                                              NeumorphicTextStyle(
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight.w300,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                )),
+                            LineChart(
                               datamap: plugcontroller.sensor_map,
                               valname: data_val_index.value,
                             ),
-                    ),
-                  ),
-                )),
+                            Container(
+                              padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                              // height: MediaQuery.of(context).size.height*0.1,
+                              // width: MediaQuery.of(context).size.width*0.7,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  InkWell(
+                                    onTap: () {
+                                      data_val_index.value = 'co2';
+                                    },
+                                    child: Container(
+                                      // color: Color.fromARGB(255, 247, 245, 244),
+                                      margin: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                                      decoration: BoxDecoration(
+                                        color: data_val_index.value == 'co2'
+                                            ? Color.fromARGB(255, 209, 209, 209)
+                                            : null,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: NeumorphicText(
+                                        '이산화탄소',
+                                        style: NeumorphicStyle(
+                                          shape: NeumorphicShape.flat,
+                                          boxShape:
+                                              NeumorphicBoxShape.roundRect(
+                                                  BorderRadius.circular(12)),
+                                          depth: 10,
+                                          lightSource: LightSource.topLeft,
+                                          color: data_val_index.value == 'co2'
+                                              ? Color.fromARGB(
+                                                  255, 255, 255, 255)
+                                              : Color.fromARGB(146, 39, 39, 37),
+                                          surfaceIntensity: 10,
+                                        ),
+                                        textStyle: NeumorphicTextStyle(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  InkWell(
+                                    onTap: () {
+                                      data_val_index.value = 'pm';
+                                    },
+                                    child: Container(
+                                      // color: Color.fromARGB(255, 247, 245, 244),
+                                      margin: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                                      decoration: BoxDecoration(
+                                        color: data_val_index.value == 'pm'
+                                            ? Color.fromARGB(255, 209, 209, 209)
+                                            : null,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: NeumorphicText(
+                                        '미세먼지',
+                                        style: NeumorphicStyle(
+                                          shape: NeumorphicShape.flat,
+                                          boxShape:
+                                              NeumorphicBoxShape.roundRect(
+                                                  BorderRadius.circular(12)),
+                                          depth: 10,
+                                          lightSource: LightSource.topLeft,
+                                          color: data_val_index.value == 'pm'
+                                              ? Color.fromARGB(
+                                                  255, 255, 255, 255)
+                                              : Color.fromARGB(146, 39, 39, 37),
+                                          surfaceIntensity: 10,
+                                        ),
+                                        textStyle: NeumorphicTextStyle(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  InkWell(
+                                    onTap: () {
+                                      data_val_index.value = 'temp';
+                                    },
+                                    child: Container(
+                                      // color: Color.fromARGB(255, 247, 245, 244),
+                                      margin: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                                      decoration: BoxDecoration(
+                                        color: data_val_index.value == 'temp'
+                                            ? Color.fromARGB(255, 209, 209, 209)
+                                            : null,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: NeumorphicText(
+                                        '기온',
+                                        style: NeumorphicStyle(
+                                          shape: NeumorphicShape.flat,
+                                          boxShape:
+                                              NeumorphicBoxShape.roundRect(
+                                                  BorderRadius.circular(12)),
+                                          depth: 10,
+                                          lightSource: LightSource.topLeft,
+                                          color: data_val_index.value == 'temp'
+                                              ? Color.fromARGB(
+                                                  255, 255, 255, 255)
+                                              : Color.fromARGB(146, 39, 39, 37),
+                                          surfaceIntensity: 10,
+                                        ),
+                                        textStyle: NeumorphicTextStyle(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -1402,38 +1998,46 @@ class LineChart extends StatelessWidget {
           xValueMapper: (ChartData data, _) => data.x,
           yValueMapper: (ChartData data, _) => data.y);
     }).toList();
-    return SfCartesianChart(
-      enableAxisAnimation: true,
-      backgroundColor: Color.fromARGB(31, 145, 172, 180),
-      primaryXAxis: DateTimeAxis(
-        // minimum: DateTime(datamap['거실']['time'][0].year,
-        //     datamap['거실']['time'][0].month, datamap['거실']['time'][0].day, datamap['거실']['time'][0].hour),
-        // maximum: DateTime(datamap['거실']['time'].last.year,
-        //     datamap['거실']['time'].last.month, datamap['거실']['time'].last.day),
-        // anchorRangeToVisiblePoints: false,
-        // labelRotation: 10,
-        desiredIntervals: 6,
-        // minorTicksPerInterval: 3000,
-        autoScrollingDeltaType: DateTimeIntervalType.hours,
-        intervalType: DateTimeIntervalType.days,
-        // autoScrollingDeltaType: DateTimeIntervalType.days,
-      ),
-      legend: Legend(
-          isVisible: true,
-          toggleSeriesVisibility: true,
-          overflowMode: LegendItemOverflowMode.wrap,
-          // offset: Offset(20, 40),
-          // height: '200',
-          position: LegendPosition.bottom
-          // borderWidth: 2,
-          ),
-      series: linelist,
-      zoomPanBehavior: ZoomPanBehavior(
-        enablePinching: true,
-        zoomMode: ZoomMode.x,
-        enablePanning: true,
-        enableDoubleTapZooming: true,
-        enableMouseWheelZooming: true,
+    return Neumorphic(
+      margin: EdgeInsets.all(10),
+      padding: EdgeInsets.all(4),
+      child: SfCartesianChart(
+        enableAxisAnimation: true,
+        backgroundColor: Color.fromARGB(255, 255, 255, 255),
+        primaryXAxis: DateTimeAxis(
+          // minimum: DateTime(datamap['거실']['time'][0].year,
+          //     datamap['거실']['time'][0].month, datamap['거실']['time'][0].day, datamap['거실']['time'][0].hour),
+          // maximum: DateTime(datamap['거실']['time'].last.year,
+          //     datamap['거실']['time'].last.month, datamap['거실']['time'].last.day),
+          // anchorRangeToVisiblePoints: false,
+          // labelRotation: 10,
+          desiredIntervals: 6,
+          // minorTicksPerInterval: 3000,
+          autoScrollingDeltaType: DateTimeIntervalType.hours,
+          intervalType: DateTimeIntervalType.days,
+          // autoScrollingDeltaType: DateTimeIntervalType.days,
+        ),
+        legend: Legend(
+            isVisible: true,
+            toggleSeriesVisibility: true,
+            overflowMode: LegendItemOverflowMode.wrap,
+            textStyle: TextStyle(
+              color: Color.fromARGB(255, 104, 76, 76).withOpacity(0.7),
+            ),
+
+            // offset: Offset(20, 40),
+            // height: '200',
+            position: LegendPosition.bottom
+            // borderWidth: 2,
+            ),
+        series: linelist,
+        zoomPanBehavior: ZoomPanBehavior(
+          enablePinching: true,
+          zoomMode: ZoomMode.x,
+          enablePanning: true,
+          enableDoubleTapZooming: true,
+          enableMouseWheelZooming: true,
+        ),
       ),
     );
   }
