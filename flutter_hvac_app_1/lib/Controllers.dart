@@ -156,6 +156,23 @@ class PlugController extends GetxController {
       } else {}
     });
   }
+
+  set_alarm(
+      String user_id, String ip, String start, String end, String state) async {
+    // SmartPlug plug = SmartPlug();
+    // plug.name = name;
+    // plug.sensornum = sensornum;
+    String alarmUrl =
+        "http://222.108.71.247:51213/rulebase_schedule?ip=${ip}&user_id=${user_id}&start=${start}&end=${end}&state=${state}";
+    print(alarmUrl);
+    await http.get(Uri.parse(alarmUrl),
+        headers: {"Access-Control_Allow_Origin": "*"}).then((Response) {
+      if (Response.statusCode == 200) {
+        print('알람ok');
+      } else {}
+    }).catchError((err) => print(err));
+    // _pluglist.add(plug);
+  }
 }
 
 class SmartPlug extends GetxController {

@@ -462,48 +462,75 @@ class Secondpage extends StatelessWidget {
                                             displayForegroundOnlyIfSelected:
                                                 true,
                                             onChanged: (value) async {
-                                              boxobs.value[index2]['state']
-                                                  .value = value;
-                                              Map alarm = {
-                                                'name': boxobs.value[index2]
-                                                    ['name'],
-                                                'start': boxobs.value[index2]
-                                                    ['start'],
-                                                'end': boxobs.value[index2]
-                                                    ['end'],
-                                                'state': value,
-                                              };
+                                              if (plugcontroller
+                                                      .pluglist
+                                                      .value[index]
+                                                      .schedule
+                                                      .value ==
+                                                  0) {
+                                                boxobs.value[index2]['state']
+                                                    .value = value;
+                                                Map alarm = {
+                                                  'name': boxobs.value[index2]
+                                                      ['name'],
+                                                  'start': boxobs.value[index2]
+                                                      ['start'],
+                                                  'end': boxobs.value[index2]
+                                                      ['end'],
+                                                  'state': value,
+                                                };
 
-                                              box.putAt(index2, alarm);
+                                                box.putAt(index2, alarm);
+                                                plugcontroller.set_alarm(
+                                                    user_id,
+                                                    plugcontroller.pluglist
+                                                        .value[index].ip,
+                                                    boxobs.value[index2]
+                                                        ['start'],
+                                                    boxobs.value[index2]['end'],
+                                                    value.toString());
 
-                                              if (value == 1) {
-                                                plugcontroller
-                                                    .pluglist
-                                                    .value[index]
-                                                    .schedule
-                                                    .value = 1;
-                                              } else {
-                                                num testind = 0;
-                                                for (var it = 0;
-                                                    it < boxobs.value.length;
-                                                    it++) {
-                                                  if (boxobs.value[it]
-                                                          ['name'] ==
-                                                      plugcontroller.pluglist
-                                                          .value[index].name) {
-                                                    testind = testind +
-                                                        boxobs
-                                                            .value[it]['state']
-                                                            .value;
-                                                  }
-                                                }
-                                                if (testind == 0) {
+                                                if (value == 1) {
                                                   plugcontroller
                                                       .pluglist
                                                       .value[index]
                                                       .schedule
-                                                      .value = 0;
+                                                      .value = 1;
+                                                } else {
+                                                  num testind = 0;
+                                                  for (var it = 0;
+                                                      it < boxobs.value.length;
+                                                      it++) {
+                                                    if (boxobs.value[it]
+                                                            ['name'] ==
+                                                        plugcontroller
+                                                            .pluglist
+                                                            .value[index]
+                                                            .name) {
+                                                      testind = testind +
+                                                          boxobs
+                                                              .value[it]
+                                                                  ['state']
+                                                              .value;
+                                                    }
+                                                  }
+                                                  if (testind == 0) {
+                                                    plugcontroller
+                                                        .pluglist
+                                                        .value[index]
+                                                        .schedule
+                                                        .value = 0;
+                                                  }
                                                 }
+                                              } else {
+                                                // 임시로 0으로 지정해서 돌게함
+                                                // 제거할때나 켜진상태에서 추가할때 0으로 바뀌도록 수정
+                                                plugcontroller
+                                                    .pluglist
+                                                    .value[index]
+                                                    .schedule
+                                                    .value = 0;
+                                                print('이미 알람이 켜져있다');
                                               }
                                             },
                                             // thumb: Neumorphic(),
@@ -932,7 +959,7 @@ class Mainhome extends StatelessWidget {
                                         child: NeumorphicText(
                                           'OFF',
                                           style: NeumorphicStyle(
-                                            shape: NeumorphicShape.concave,
+                                            shape: NeumorphicShape.flat,
                                             boxShape:
                                                 NeumorphicBoxShape.roundRect(
                                                     BorderRadius.circular(12)),
@@ -953,7 +980,7 @@ class Mainhome extends StatelessWidget {
                                         child: NeumorphicText(
                                           'ON',
                                           style: NeumorphicStyle(
-                                            shape: NeumorphicShape.concave,
+                                            shape: NeumorphicShape.flat,
                                             boxShape:
                                                 NeumorphicBoxShape.roundRect(
                                                     BorderRadius.circular(12)),
