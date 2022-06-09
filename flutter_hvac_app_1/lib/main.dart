@@ -378,11 +378,12 @@ class Secondpage extends StatelessWidget {
                               SizedBox(
                                 width: 100,
                                 child: NeumorphicText(
-                                  plugcontroller.pluglist.value[index].name +
-                                      ': ' +
-                                      plugcontroller
-                                          .pluglist.value[index].schedule.value
-                                          .toString(),
+                                  plugcontroller.pluglist.value[index].name,
+                                  // +
+                                  //     ': ' +
+                                  //     plugcontroller
+                                  //         .pluglist.value[index].schedule.value
+                                  //         .toString(),
                                   style: NeumorphicStyle(
                                     shape: NeumorphicShape.flat,
                                     boxShape: NeumorphicBoxShape.roundRect(
@@ -1297,7 +1298,7 @@ class Datapage extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(30, 0, 0, 8),
+              padding: const EdgeInsets.fromLTRB(30, 0, 0, 1),
               child: Text(
                 '* 모든 데이터는 30분 평균이며, 실내공기질은 모니터링지점 평균값을 사용합니다.',
                 style: TextStyle(
