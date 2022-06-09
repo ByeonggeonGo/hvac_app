@@ -464,6 +464,18 @@ class Secondpage extends StatelessWidget {
                                             onChanged: (value) async {
                                               boxobs.value[index2]['state']
                                                   .value = value;
+                                              Map alarm = {
+                                                'name': boxobs.value[index2]
+                                                    ['name'],
+                                                'start': boxobs.value[index2]
+                                                    ['start'],
+                                                'end': boxobs.value[index2]
+                                                    ['end'],
+                                                'state': value,
+                                              };
+
+                                              box.putAt(index2, alarm);
+
                                               if (value == 1) {
                                                 plugcontroller
                                                     .pluglist
@@ -714,8 +726,8 @@ class Mainhome extends StatelessWidget {
                                         true
                                     ? IconButton(
                                         onPressed: () {
-                                          var test = plugcontroller.pluglist();
-                                          test[index].turn_off(user_id);
+                                          plugcontroller.pluglist.value[index]
+                                              .turn_off(user_id);
                                         },
                                         icon: Icon(Icons.offline_bolt),
                                         color:
@@ -724,8 +736,8 @@ class Mainhome extends StatelessWidget {
                                       )
                                     : IconButton(
                                         onPressed: () {
-                                          var test = plugcontroller.pluglist();
-                                          test[index].turn_on(user_id);
+                                          plugcontroller.pluglist.value[index]
+                                              .turn_on(user_id);
                                         },
                                         icon: Icon(Icons.offline_bolt),
                                         color:
