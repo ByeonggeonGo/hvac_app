@@ -1634,111 +1634,111 @@ class Datapage extends StatelessWidget {
                                               ),
                                             ),
                                           ),
-                                          Flexible(
-                                            fit: FlexFit.tight,
-                                            flex: 1,
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                color: Color.fromARGB(
-                                                    255, 255, 255, 255),
-                                                border: Border.all(
-                                                  color: Color.fromARGB(
-                                                      255, 190, 190, 190),
-                                                  width: 0.3,
-                                                ),
-                                                // borderRadius: BorderRadius.circular(3),
-                                              ),
-                                              padding: EdgeInsets.all(6),
-                                              // color: Color.fromARGB(159, 217, 232, 233),
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  NeumorphicText(
-                                                    '기온',
-                                                    style: NeumorphicStyle(
-                                                      shape:
-                                                          NeumorphicShape.flat,
-                                                      boxShape:
-                                                          NeumorphicBoxShape
-                                                              .roundRect(
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          12)),
-                                                      // depth: 10,
-                                                      // lightSource: LightSource.top,
-                                                      color: Color.fromARGB(
-                                                          255, 7, 7, 7),
-                                                      surfaceIntensity: 10,
-                                                    ),
-                                                    textStyle:
-                                                        NeumorphicTextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w300,
-                                                    ),
-                                                  ),
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      NeumorphicText(
-                                                        plugcontroller
-                                                            .sensor_map['평균']
-                                                                ['temp']
-                                                            .last
-                                                            .toString(),
-                                                        style: NeumorphicStyle(
-                                                          shape: NeumorphicShape
-                                                              .flat,
-                                                          boxShape: NeumorphicBoxShape
-                                                              .roundRect(
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          12)),
-                                                          // depth: 10,
-                                                          // lightSource: LightSource.top,
-                                                          color: Color.fromARGB(
-                                                              255, 7, 7, 7),
-                                                          surfaceIntensity: 10,
-                                                        ),
-                                                        textStyle:
-                                                            NeumorphicTextStyle(
-                                                          fontSize: 20,
-                                                          fontWeight:
-                                                              FontWeight.w300,
-                                                        ),
-                                                      ),
-                                                      NeumorphicText(
-                                                        ' °C',
-                                                        style: NeumorphicStyle(
-                                                          shape: NeumorphicShape
-                                                              .flat,
-                                                          boxShape: NeumorphicBoxShape
-                                                              .roundRect(
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          12)),
-                                                          // depth: 10,
-                                                          // lightSource: LightSource.top,
-                                                          color: Color.fromARGB(
-                                                              255, 7, 7, 7),
-                                                          surfaceIntensity: 10,
-                                                        ),
-                                                        textStyle:
-                                                            NeumorphicTextStyle(
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.w300,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
+                                          // Flexible(
+                                          //   fit: FlexFit.tight,
+                                          //   flex: 1,
+                                          //   child: Container(
+                                          //     decoration: BoxDecoration(
+                                          //       color: Color.fromARGB(
+                                          //           255, 255, 255, 255),
+                                          //       border: Border.all(
+                                          //         color: Color.fromARGB(
+                                          //             255, 190, 190, 190),
+                                          //         width: 0.3,
+                                          //       ),
+                                          //       // borderRadius: BorderRadius.circular(3),
+                                          //     ),
+                                          //     padding: EdgeInsets.all(6),
+                                          //     // color: Color.fromARGB(159, 217, 232, 233),
+                                          //     child: Column(
+                                          //       mainAxisAlignment:
+                                          //           MainAxisAlignment.center,
+                                          //       children: [
+                                          //         NeumorphicText(
+                                          //           '기온',
+                                          //           style: NeumorphicStyle(
+                                          //             shape:
+                                          //                 NeumorphicShape.flat,
+                                          //             boxShape:
+                                          //                 NeumorphicBoxShape
+                                          //                     .roundRect(
+                                          //                         BorderRadius
+                                          //                             .circular(
+                                          //                                 12)),
+                                          //             // depth: 10,
+                                          //             // lightSource: LightSource.top,
+                                          //             color: Color.fromARGB(
+                                          //                 255, 7, 7, 7),
+                                          //             surfaceIntensity: 10,
+                                          //           ),
+                                          //           textStyle:
+                                          //               NeumorphicTextStyle(
+                                          //             fontSize: 14,
+                                          //             fontWeight:
+                                          //                 FontWeight.w300,
+                                          //           ),
+                                          //         ),
+                                          //         Row(
+                                          //           mainAxisAlignment:
+                                          //               MainAxisAlignment
+                                          //                   .center,
+                                          //           children: [
+                                          //             NeumorphicText(
+                                          //               plugcontroller
+                                          //                   .sensor_map['평균']
+                                          //                       ['temp']
+                                          //                   .last
+                                          //                   .toString(),
+                                          //               style: NeumorphicStyle(
+                                          //                 shape: NeumorphicShape
+                                          //                     .flat,
+                                          //                 boxShape: NeumorphicBoxShape
+                                          //                     .roundRect(
+                                          //                         BorderRadius
+                                          //                             .circular(
+                                          //                                 12)),
+                                          //                 // depth: 10,
+                                          //                 // lightSource: LightSource.top,
+                                          //                 color: Color.fromARGB(
+                                          //                     255, 7, 7, 7),
+                                          //                 surfaceIntensity: 10,
+                                          //               ),
+                                          //               textStyle:
+                                          //                   NeumorphicTextStyle(
+                                          //                 fontSize: 20,
+                                          //                 fontWeight:
+                                          //                     FontWeight.w300,
+                                          //               ),
+                                          //             ),
+                                          //             NeumorphicText(
+                                          //               ' °C',
+                                          //               style: NeumorphicStyle(
+                                          //                 shape: NeumorphicShape
+                                          //                     .flat,
+                                          //                 boxShape: NeumorphicBoxShape
+                                          //                     .roundRect(
+                                          //                         BorderRadius
+                                          //                             .circular(
+                                          //                                 12)),
+                                          //                 // depth: 10,
+                                          //                 // lightSource: LightSource.top,
+                                          //                 color: Color.fromARGB(
+                                          //                     255, 7, 7, 7),
+                                          //                 surfaceIntensity: 10,
+                                          //               ),
+                                          //               textStyle:
+                                          //                   NeumorphicTextStyle(
+                                          //                 fontSize: 14,
+                                          //                 fontWeight:
+                                          //                     FontWeight.w300,
+                                          //               ),
+                                          //             ),
+                                          //           ],
+                                          //         ),
+                                          //       ],
+                                          //     ),
+                                          //   ),
+                                          // ),
                                         ],
                                       ),
                                     )
@@ -1822,39 +1822,39 @@ class Datapage extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                InkWell(
-                                  onTap: () {
-                                    data_val_index.value = 'temp';
-                                  },
-                                  child: Container(
-                                    // color: Color.fromARGB(255, 247, 245, 244),
-                                    margin: EdgeInsets.fromLTRB(5, 0, 5, 0),
-                                    decoration: BoxDecoration(
-                                      color: data_val_index.value == 'temp'
-                                          ? Color.fromARGB(255, 209, 209, 209)
-                                          : null,
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: NeumorphicText(
-                                      '기온',
-                                      style: NeumorphicStyle(
-                                        shape: NeumorphicShape.flat,
-                                        boxShape: NeumorphicBoxShape.roundRect(
-                                            BorderRadius.circular(12)),
-                                        depth: 10,
-                                        lightSource: LightSource.topLeft,
-                                        color: data_val_index.value == 'temp'
-                                            ? Color.fromARGB(255, 255, 255, 255)
-                                            : Color.fromARGB(146, 39, 39, 37),
-                                        surfaceIntensity: 10,
-                                      ),
-                                      textStyle: NeumorphicTextStyle(
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                                // InkWell(
+                                //   onTap: () {
+                                //     data_val_index.value = 'temp';
+                                //   },
+                                //   child: Container(
+                                //     // color: Color.fromARGB(255, 247, 245, 244),
+                                //     margin: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                                //     decoration: BoxDecoration(
+                                //       color: data_val_index.value == 'temp'
+                                //           ? Color.fromARGB(255, 209, 209, 209)
+                                //           : null,
+                                //       borderRadius: BorderRadius.circular(10),
+                                //     ),
+                                //     child: NeumorphicText(
+                                //       '기온',
+                                //       style: NeumorphicStyle(
+                                //         shape: NeumorphicShape.flat,
+                                //         boxShape: NeumorphicBoxShape.roundRect(
+                                //             BorderRadius.circular(12)),
+                                //         depth: 10,
+                                //         lightSource: LightSource.topLeft,
+                                //         color: data_val_index.value == 'temp'
+                                //             ? Color.fromARGB(255, 255, 255, 255)
+                                //             : Color.fromARGB(146, 39, 39, 37),
+                                //         surfaceIntensity: 10,
+                                //       ),
+                                //       textStyle: NeumorphicTextStyle(
+                                //         fontSize: 17,
+                                //         fontWeight: FontWeight.w400,
+                                //       ),
+                                //     ),
+                                //   ),
+                                // ),
                               ],
                             ),
                           ),
