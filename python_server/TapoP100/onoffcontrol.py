@@ -11,6 +11,7 @@ import numpy as np
 from flask import Blueprint, stream_with_context, request, Response, jsonify
 import asyncio
 from threading import Thread
+import multiprocessing
 
 import os
 import requests
@@ -399,6 +400,21 @@ def index():
 #일단 내 계정으로 설정, 나중에 수정가능하게 할지ㅣ 검토,로그인 시스템 등
 email = 'rhqudrjs2@naver.com'
 pw = 'qudrjs12#'
+# sensor_list = ['44','45','46','47','48','49','50','51','53']
+sensor_list = ['44','45','46','47','48']
+sensor_info = {
+	'44': '거실',
+	'45': '거실(청정기옆)',
+	'46': '안방',
+	'47': '안쪽방',
+	'48': '중간방',
+	# '49': '서재(가장아래)',
+	# '50': '서재(아래)',
+	# '51': '서재(중간)',
+	# '53': '서재(맨위)',
+	}
+
+
 # ip = '192.168.0.115'
 # ip = '192.168.0.118'
 
@@ -663,7 +679,6 @@ def offline_rule_base_on():
 					time.sleep(10)
 		elif sensornum == 0 :
 			# sql=f"SELECT * FROM sensor_{sensornum} WHERE 날짜 > now() - INTERVAL 10 MINUTE;"
-			sensor_list = [45,46,47,48,49,50,51,53,]
 
 			if tt.loc[tt.ip == ip,['rulebase']].values[0] == 1:
 				print('rulebase_이미 작동중')
@@ -786,13 +801,21 @@ def rule_base_on():
 				else:
 					env_val = float(df.PM.values[-1])
 
-				yield str(env_val)
 				
+
+				yield str(env_val)
 				time.sleep(10)
+				#현재 운영 상태
+				path = os.getcwd()
+				tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+				if tt.loc[tt.ip == ip,['rulebase']].values[0] == 0:
+					print('rulebase_작동중지_yield함수')
+					break
+				else: pass
 		else:
-			sensor_list = [45,46,47,48,49,50,51,53,]
 
 			while rulestat:
+				
 				#
 				val_list = []
 				for i in sensor_list:
@@ -822,8 +845,17 @@ def rule_base_on():
 						env_val = float(df.PM.values[-1])
 					val_list.append(env_val)
 				max_val = max(val_list)
+				
+
 				yield str(max_val)
 				time.sleep(10)
+				#현재 운영 상태
+				path = os.getcwd()
+				tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+				if tt.loc[tt.ip == ip,['rulebase']].values[0] == 0:
+					print('rulebase_작동중지_yield함수')
+					break
+				else: pass
 		
 	return Response(stream_with_context(generate(ip,user_id)))
 	# return Response(stream_with_context(th2.start()))
@@ -865,23 +897,14 @@ def onoff_history():
 # 플러터 앱 시작할때 data안들어가더라도 데이터 미리 받고있기. 빨리볼 수 있도록
 # 그후 30번정도 신규데이터 넣어주기?(고려)
 
+
+
 @bp.route('/mean_data')
 def mean_data():
 	#"http://222.108.71.247:51213/mean_data";
 
 	# user_id = request.args.get('user_id')
-	sensor_list = ['44','45','46','47','48','49','50','51','53']
-	sensor_info = {
-		'44': '거실',
-		'45': '거실(청정기옆)',
-		'46': '안방',
-		'47': '안쪽방',
-		'48': '중간방',
-		'49': '서재(가장아래)',
-		'50': '서재(아래)',
-		'51': '서재(중간)',
-		'53': '서재(맨위)',
-		}
+	
 
 	# sensor_list = ['44','45']
 	data_list = []
@@ -941,21 +964,231 @@ def rulebase_schedule():
 	end = request.args.get('end')
 	state = request.args.get('state')
 
+	def schedule_alarm():
+		sleep_time = 10
+		# schedule.every().day.at(start+':'+'00').do(schedule_job_on)
+		# schedule.every().day.at(end+':'+'00').do(schedule_job_off)
+		schedule.every().day.at('17:24').do(schedule_job_on)
+		schedule.every().day.at('17:25').do(schedule_job_off)
+		
+		while True:
+			path = os.getcwd()
+			tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+			if tt.loc[tt.ip == ip,['schedule']].values[0][0] == 1 :
+				print('루프도는중' + ": "+ str(ip))
+				# schedule.run_pending()
+				Thread(target=schedule.run_pending).start()
+
+
+				time.sleep(sleep_time)
+			elif tt.loc[tt.ip == ip,['schedule']].values[0][0] == 0: 
+				print('스케줄알람 종료됨')
+				break
+				
+
+	def schedule_job_on():
+		
+		offline_rule_base_on2(ip,user_id)
+		return 'ok'
+	def schedule_job_off():
+		offline_rule_base_off(ip,user_id)
+		return 'okdk'
+
 	path = os.getcwd()
 	tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
 
-	if state == 'on':
+	if state == '1':
 		tt.loc[tt.ip == ip,['schedule']] = 1
 		tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
 
-	elif state == 'off':
+		alarm_thread = Thread(target=schedule_alarm)
+		alarm_thread.start()
+		# Thread(target=schedule_alarm).start()
+		# proc = multiprocessing.Process(target = schedule_alarm, args=('시작',))
+		# proc.start()
+		# proc.join()
+
+		print('알람시작')
+
+	elif state == '0':
 		tt.loc[tt.ip == ip,['schedule']] = 0
 		tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
 
 	return 'ok'
 
-def job():
-	print("task")
 
 
+def offline_rule_base_on2(ip, user_id):
 
+	def loop_agent():
+		path = os.getcwd()
+		tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+		type_agent = tt.loc[tt.ip == ip,['type_agent']].values
+
+		sensornum = tt.loc[tt.ip == ip,['sensornum']].values[0][0]
+		if sensornum != 0:
+			sql=f"SELECT * FROM sensor_{sensornum} WHERE 날짜 > now() - INTERVAL 10 MINUTE;"
+
+			if tt.loc[tt.ip == ip,['rulebase']].values[0] == 1:
+				print('rulebase_이미 작동중')
+			elif tt.loc[tt.ip == ip,['rulebase']].values[0] == 0:
+				tt.loc[tt.ip == ip,['rulebase']] = 1
+				tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
+				print('룰베이스저장했다' +": "+ str(ip))
+				while True:
+					print('룰베이스잘켜짐' +": "+ str(ip))
+					#
+					conn = pymysql.connect(
+							user='room_test',
+							passwd='ehrnc64581',
+							#222.108.71.247(외부주소)
+							host='222.108.71.247',
+							#7656(외부포트)
+							port=7656,
+							db='sensor',
+							)
+					#
+					df=pd.read_sql_query(sql,conn)
+					conn.close()
+					if df.empty:
+						tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+						tt.loc[tt.ip == ip,['rulebase']] = 0
+						tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
+						raise StopIteration
+						
+					# df.CO2.values[-1]
+					if type_agent == 'S' or type_agent == 'V':
+						env_val = float(df.CO2.values[-1])
+					else:
+						env_val = float(df.PM.values[-1])
+
+					#현재 운영 상태
+					path = os.getcwd()
+					stat = tt.loc[tt.ip == ip,['on_state']].values[0]
+					set_val = tt.loc[tt.ip == ip,['ruleset']].values[0]
+					if tt.loc[tt.ip == ip,['rulebase']].values[0] == 0:
+						print('rulebase_작동중지')
+						break
+					else: pass
+
+					#조건부 온오프
+					if env_val > int(set_val):
+						if stat: pass
+						else: on_local(ip,user_id)
+						
+					else:
+						if stat: off_local(ip,user_id)
+						else: pass
+					# print('작동중: ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+					#기록저장
+					time_now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+					history_sam = {
+						'time':time_now,
+						'ip':ip,
+						'state':'rulebase_on',
+						'val':env_val ,
+						}
+					
+					#dd = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history_rulebase'+'.csv',))
+					#dd = dd.append(history_sam,ignore_index=True)
+					#dd.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history_rulebase'+'.csv',),index = False)
+					print(history_sam)
+					# file same time error, make another file for save
+					time.sleep(10)
+					tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+		elif sensornum == 0 :
+			# sql=f"SELECT * FROM sensor_{sensornum} WHERE 날짜 > now() - INTERVAL 10 MINUTE;"
+			
+
+			if tt.loc[tt.ip == ip,['rulebase']].values[0] == 1:
+				print('rulebase_이미 작동중')
+			elif tt.loc[tt.ip == ip,['rulebase']].values[0] == 0:
+				tt.loc[tt.ip == ip,['rulebase']] = 1
+				tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
+				print('룰베이스저장했다' +": "+ str(ip))
+				while True:
+					print('룰베이스잘켜짐' +": "+ str(ip))
+					#
+					val_list = []
+					for i in sensor_list:
+						conn = pymysql.connect(
+								user='room_test',
+								passwd='ehrnc64581',
+								#222.108.71.247(외부주소)
+								host='222.108.71.247',
+								#7656(외부포트)
+								port=7656,
+								db='sensor',
+								)
+						#
+						sql=f"SELECT * FROM sensor_{i} WHERE 날짜 > now() - INTERVAL 10 MINUTE;"
+						df=pd.read_sql_query(sql,conn)
+						conn.close()
+						
+						if df.empty:
+							
+							tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+							tt.loc[tt.ip == ip,['rulebase']] = 0
+							tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
+							raise StopIteration
+							
+						# df.CO2.values[-1]
+						if type_agent == 'S' or type_agent == 'V':
+							env_val = float(df.CO2.values[-1])
+						else:
+							env_val = float(df.PM.values[-1])
+						val_list.append(env_val)
+			
+					max_val = max(val_list)
+					
+
+					#현재 운영 상태
+					path = os.getcwd()
+					# tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+					stat = tt.loc[tt.ip == ip,['on_state']].values[0]
+					set_val = tt.loc[tt.ip == ip,['ruleset']].values[0]
+					if tt.loc[tt.ip == ip,['rulebase']].values[0] == 0:
+						print('rulebase_작동중지')
+						break
+					else: pass
+
+					#조건부 온오프
+					if max_val > int(set_val):
+						if stat: pass
+						else: on_local(ip,user_id)
+						
+					else:
+						if stat: off_local(ip,user_id)
+						else: pass
+					# print('작동중: ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+					#기록저장
+					time_now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+					history_sam = {
+						'time':time_now,
+						'ip':ip,
+						'state':'rulebase_on',
+						'val':max_val ,
+						}
+					
+					#dd = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history_rulebase'+'.csv',))
+					#dd = dd.append(history_sam,ignore_index=True)
+					#dd.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'_history_rulebase'+'.csv',),index = False)
+					print(history_sam)
+					# file same time error, make another file for save
+					# tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
+					time.sleep(10)
+					tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+	
+	# Thread(target=loop_agent).start()
+	# print('룰베이스 쓰레드 시작')
+	loop_agent()
+	return 'ok'
+
+def offline_rule_base_off(ip,user_id):
+
+	path = os.getcwd()
+	tt = pd.read_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv',))
+	tt.loc[tt.ip == ip,['rulebase']] = 0
+	tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
+
+	return print('룰베이스잘꺼짐')
