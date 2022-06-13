@@ -134,25 +134,66 @@ class PlugController extends GetxController {
         headers: {"Access-Control_Allow_Origin": "*"}).then((Response) {
       if (Response.statusCode == 200) {
         sensor_data.add(jsonDecode(Response.body));
-
-        // print(sensor_data.value[0]['거실']);
         sensor_data.value[0].forEach((k, v) {
+          List<double> co2_list = [];
+          List<double> pm_list = [];
+          List<double> temp_list = [];
+          List<DateTime> time_list = [];
+
+          Map r_data = jsonDecode(v);
+
+          for (int i = 0; i < r_data.length; i++) {
+            if (r_data[r_data.keys.toList()[i]]['co2'] != null) {
+              co2_list.add(double.parse(
+                  r_data[r_data.keys.toList()[i]]['co2'].toStringAsFixed(2)));
+              pm_list.add(double.parse(
+                  r_data[r_data.keys.toList()[i]]['pm'].toStringAsFixed(2)));
+              temp_list.add(double.parse(
+                  r_data[r_data.keys.toList()[i]]['temp'].toStringAsFixed(2)));
+              time_list.add(DateTime.parse(r_data.keys.toList()[i]));
+            }
+          }
           _sensor_map[k] = {
-            'co2': jsonDecode(v).entries.map<double>((e) {
-              return double.parse(e.value['co2'].toStringAsFixed(2));
-            }).toList(),
-            'pm': jsonDecode(v).entries.map<double>((e) {
-              return double.parse(e.value['pm'].toStringAsFixed(2));
-            }).toList(),
-            'temp': jsonDecode(v).entries.map<double>((e) {
-              return double.parse(e.value['temp'].toStringAsFixed(2));
-            }).toList(),
-            'time': jsonDecode(v).entries.map<DateTime>((e) {
-              return DateTime.parse(e.key);
-            }).toList()
+            'co2': co2_list,
+            'pm': pm_list,
+            'temp': temp_list,
+            'time': time_list,
           };
         });
         dataset_index.value = 1;
+
+        // print(sensor_data.value[0]['거실']);
+        // null인 값은 빼고 리스트 만들기
+        // sensor_data.value[0].forEach((k, v) {
+        //   _sensor_map[k] = {
+        //     'co2': jsonDecode(v).entries.map<double>((e) {
+        //       // return double.parse(e.value['co2']);
+        //       if (e.value['co2'] != null) {
+        //         return double.parse(e.value['co2'].toStringAsFixed(2));
+        //       } else {
+        //         return null;
+        //       }
+        //     }).toList(),
+        //     'pm': jsonDecode(v).entries.map<double>((e) {
+        //       if (e.value['pm'] != null) {
+        //         return double.parse(e.value['pm'].toStringAsFixed(2));
+        //       } else {
+        //         return null;
+        //       }
+        //     }).toList(),
+        //     'temp': jsonDecode(v).entries.map<double>((e) {
+        //       if (e.value['temp'] != null) {
+        //         return double.parse(e.value['temp'].toStringAsFixed(2));
+        //       } else {
+        //         return null;
+        //       }
+        //     }).toList(),
+        //     'time': jsonDecode(v).entries.map<DateTime>((e) {
+        //       return DateTime.parse(e.key);
+        //     }).toList(),
+        //   };
+        // });
+        // dataset_index.value = 1;
       } else {}
     });
   }
