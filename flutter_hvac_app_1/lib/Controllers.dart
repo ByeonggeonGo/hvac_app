@@ -10,9 +10,10 @@ class PlugController extends GetxController {
   RxList sensor_data = [].obs;
   Map _sensor_map = {};
   var dataset_index = 0.obs;
+  // String pub_ip = '43.200.68.231:51213';
+  // String pub_ip = '43.200.68.231:51213';
   String sensor_dataset_Url = "http://43.200.68.231:51213/mean_data";
   RxList get pluglist => _pluglist;
-  String pub_ip = '43.200.68.231:51213';
 
   Map get sensor_map => _sensor_map;
 
