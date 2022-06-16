@@ -3,16 +3,11 @@ from flask import Blueprint
 from glob import glob
 import os
 import pandas as pd
-import tensorflow as tf
-from tensorflow import keras
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import MinMaxScaler
 import numpy as np
 from flask import Blueprint, stream_with_context, request, Response, jsonify
 import asyncio
 from threading import Thread
 import multiprocessing
-
 import logging
 
 logger = logging.getLogger()
@@ -24,8 +19,6 @@ logger.addHandler(stream_handler)
 file_handler = logging.FileHandler('output_log.log')
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
-
-
 
 import os
 import requests
@@ -417,6 +410,8 @@ pw = 'qudrjs12#'
 # sensor_list = ['44','45','46','47','48','49','50','51','53']
 sensor_list = ['44','45','46','47','48','49']
 sensor_list_noout = ['44','45','46','47','48']
+# sensor_list = ['54']
+# sensor_list_noout = ['54']
 sensor_info = {
 	'44': '거실',
 	'45': '거실(청정기옆)',
@@ -424,9 +419,10 @@ sensor_info = {
 	'47': '안쪽방',
 	'48': '중간방',
 	'49': '외기측정망',
-	# '50': '서재(아래)',
-	# '51': '서재(중간)',
-	# '53': '서재(맨위)',
+	# '54': '---',
+	'50': '서재(아래)',
+	'51': '서재(중간)',
+	'53': '서재(맨위)',
 	}
 
 
@@ -635,12 +631,10 @@ def offline_rule_base_on():
 				while True:
 					#
 					conn = pymysql.connect(
-							user='room_test',
-							passwd='ehrnc64581',
-							#222.108.71.247(외부주소)
-							host='222.108.71.247',
-							#7656(외부포트)
-							port=7656,
+							user='ehrnc',
+							passwd='ehrnc6458!',
+							host='mlsensor.cdpjszvvkbxz.ap-northeast-2.rds.amazonaws.com',
+							port=3306,
 							db='sensor',
 							)
 					#
@@ -705,12 +699,10 @@ def offline_rule_base_on():
 					val_list = []
 					for i in sensor_list_noout:
 						conn = pymysql.connect(
-								user='room_test',
-								passwd='ehrnc64581',
-								#222.108.71.247(외부주소)
-								host='222.108.71.247',
-								#7656(외부포트)
-								port=7656,
+								user='ehrnc',
+								passwd='ehrnc6458!',
+								host='mlsensor.cdpjszvvkbxz.ap-northeast-2.rds.amazonaws.com',
+								port=3306,
 								db='sensor',
 								)
 						#
@@ -793,12 +785,10 @@ def rule_base_on():
 			while rulestat:
 				#
 				conn = pymysql.connect(
-						user='room_test',
-						passwd='ehrnc64581',
-						#222.108.71.247(외부주소)
-						host='222.108.71.247',
-						#7656(외부포트)
-						port=7656,
+						user='ehrnc',
+						passwd='ehrnc6458!',
+						host='mlsensor.cdpjszvvkbxz.ap-northeast-2.rds.amazonaws.com',
+						port=3306,
 						db='sensor',
 						)
 				#
@@ -836,12 +826,10 @@ def rule_base_on():
 				for i in sensor_list_noout:
 					sql=f"SELECT * FROM sensor_{i} WHERE 날짜 > now() - INTERVAL 10 MINUTE;"
 					conn = pymysql.connect(
-							user='room_test',
-							passwd='ehrnc64581',
-							#222.108.71.247(외부주소)
-							host='222.108.71.247',
-							#7656(외부포트)
-							port=7656,
+							user='ehrnc',
+							passwd='ehrnc6458!',
+							host='mlsensor.cdpjszvvkbxz.ap-northeast-2.rds.amazonaws.com',
+							port=3306,
 							db='sensor',
 							)
 					#
@@ -923,12 +911,10 @@ def mean_data():
 	data_set = {}
 	for i in sensor_list:
 		conn = pymysql.connect(
-		user='room_test',
-		passwd='ehrnc64581',
-		#222.108.71.247(외부주소)
-		host='222.108.71.247',
-		#7656(외부포트)
-		port=7656,
+		user='ehrnc',
+		passwd='ehrnc6458!',
+		host='mlsensor.cdpjszvvkbxz.ap-northeast-2.rds.amazonaws.com',
+		port=3306,
 		db='sensor',
 		)
 
@@ -1052,12 +1038,10 @@ def offline_rule_base_on2(ip, user_id):
 					logger.info('룰베이스잘켜짐' +": "+ str(ip))
 					#
 					conn = pymysql.connect(
-							user='room_test',
-							passwd='ehrnc64581',
-							#222.108.71.247(외부주소)
-							host='222.108.71.247',
-							#7656(외부포트)
-							port=7656,
+							user='ehrnc',
+							passwd='ehrnc6458!',
+							host='mlsensor.cdpjszvvkbxz.ap-northeast-2.rds.amazonaws.com',
+							port=3306,
 							db='sensor',
 							)
 					#
@@ -1125,12 +1109,10 @@ def offline_rule_base_on2(ip, user_id):
 					val_list = []
 					for i in sensor_list_noout:
 						conn = pymysql.connect(
-								user='room_test',
-								passwd='ehrnc64581',
-								#222.108.71.247(외부주소)
-								host='222.108.71.247',
-								#7656(외부포트)
-								port=7656,
+								user='ehrnc',
+								passwd='ehrnc6458!',
+								host='mlsensor.cdpjszvvkbxz.ap-northeast-2.rds.amazonaws.com',
+								port=3306,
 								db='sensor',
 								)
 						#
@@ -1204,4 +1186,4 @@ def offline_rule_base_off(ip,user_id):
 	tt.loc[tt.ip == ip,['rulebase']] = 0
 	tt.to_csv(os.path.join(path,'TapoP100',"DB","controller_data",user_id+'.csv'),index = False)
 
-	return logger.info('룰베이스잘꺼짐')
+	return print('룰베이스잘꺼짐')
