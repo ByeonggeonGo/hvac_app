@@ -26,6 +26,7 @@ Map sensor_info = {
   '50': '서재(아래)',
   '51': '서재(중간)',
   '53': '서재(맨위)',
+  '54': '테스트',
 };
 var box;
 RxList boxobs = [].obs;
@@ -839,15 +840,27 @@ class Mainhome extends StatelessWidget {
                                                   CrossAxisAlignment.stretch,
                                               children: [
                                                 NeumorphicText(
-                                                  '자동감시' +
-                                                      '기준: ' +
-                                                      plugcontroller
-                                                          .pluglist
-                                                          .value[index]
-                                                          .ruleset
-                                                          .value
-                                                          .toString() +
-                                                      'ppm',
+                                                  plugcontroller
+                                                              .pluglist
+                                                              .value[index]
+                                                              .typeagent ==
+                                                          'A'
+                                                      ? '자동감시기준: ' +
+                                                          plugcontroller
+                                                              .pluglist
+                                                              .value[index]
+                                                              .ruleset
+                                                              .value
+                                                              .toString() +
+                                                          'µg/m3'
+                                                      : '자동감시기준: ' +
+                                                          plugcontroller
+                                                              .pluglist
+                                                              .value[index]
+                                                              .ruleset
+                                                              .value
+                                                              .toString() +
+                                                          'ppm',
                                                   style: NeumorphicStyle(
                                                     shape: NeumorphicShape.flat,
                                                     boxShape: NeumorphicBoxShape
@@ -878,7 +891,7 @@ class Mainhome extends StatelessWidget {
                                                               .value[index]
                                                               .sensorval
                                                               .value +
-                                                          ' ppm'
+                                                          ' µg/m3'
                                                       : 'CO2: ' +
                                                           plugcontroller
                                                               .pluglist
@@ -1606,7 +1619,7 @@ class Datapage extends StatelessWidget {
                                                         ),
                                                       ),
                                                       NeumorphicText(
-                                                        ' ppm',
+                                                        ' µg/m3',
                                                         style: NeumorphicStyle(
                                                           shape: NeumorphicShape
                                                               .flat,
