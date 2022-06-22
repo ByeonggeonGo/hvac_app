@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:io';
+// import 'dart:io';
+
 // 43.200.68.231
 class PlugController extends GetxController {
   var _pluglist = [].obs;
@@ -11,6 +12,7 @@ class PlugController extends GetxController {
   var dataset_index = 0.obs;
   // String pub_ip = '43.200.68.231:51213';
   // String pub_ip = '43.200.68.231:51213';
+  // 192.168.0.108:51213
   String sensor_dataset_Url = "http://43.200.68.231:51213/mean_data";
   RxList get pluglist => _pluglist;
 
@@ -24,8 +26,10 @@ class PlugController extends GetxController {
     String addUrl =
         "http://43.200.68.231:51213/add_plug?ip=${ip}&user_id=${user_id}&plug_name=${name}&sensornum=${sensornum}&type_agent=${typeagent}&ruleset=${ruleset}";
     print(addUrl);
-    await http.get(Uri.parse(addUrl),
-        headers: {"Access-Control_Allow_Origin": "*"}).then((Response) {
+    await http.get(Uri.parse(addUrl), headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
+    }).then((Response) {
       if (Response.statusCode == 200) {
         SmartPlug plug = SmartPlug();
         _pluglist.add(plug);
@@ -52,8 +56,10 @@ class PlugController extends GetxController {
   remove_plug(String user_id, String ip, String name) async {
     String removeUrl =
         "http://43.200.68.231:51213/remove_plug?ip=${ip}&user_id=${user_id}&plug_name=${name}";
-    await http.get(Uri.parse(removeUrl),
-        headers: {"Access-Control_Allow_Origin": "*"}).then((Response) {
+    await http.get(Uri.parse(removeUrl), headers: {
+      "Access-Control_Allow_Origin": "*",
+      "Access-Control_Allow_Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
+    }).then((Response) {
       if (Response.statusCode == 200) {
         for (int i = 0; i < _pluglist.length; i++) {
           if (_pluglist[i].ip == ip) {
@@ -85,7 +91,10 @@ class PlugController extends GetxController {
 
     await http.get(
       Uri.parse(plug_list_Url),
-      headers: {"Access-Control_Allow_Origin": "*"},
+      headers: {
+        "Access-Control_Allow_Origin": "*",
+        "Access-Control_Allow_Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
+      },
     ).then((Response) {
       if (Response.statusCode == 200) {
         // _pluglist.clear();
@@ -131,8 +140,10 @@ class PlugController extends GetxController {
   }
 
   load_data() async {
-    await http.get(Uri.parse(sensor_dataset_Url),
-        headers: {"Access-Control_Allow_Origin": "*"}).then((Response) {
+    await http.get(Uri.parse(sensor_dataset_Url), headers: {
+      "Access-Control_Allow_Origin": "*",
+      "Access-Control_Allow_Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
+    }).then((Response) {
       if (Response.statusCode == 200) {
         sensor_data.add(jsonDecode(Response.body));
         sensor_data.value[0].forEach((k, v) {
@@ -207,8 +218,10 @@ class PlugController extends GetxController {
     String alarmUrl =
         "http://43.200.68.231:51213/rulebase_schedule?ip=${ip}&user_id=${user_id}&start=${start}&end=${end}&state=${state}";
     print(alarmUrl);
-    await http.get(Uri.parse(alarmUrl),
-        headers: {"Access-Control_Allow_Origin": "*"}).then((Response) {
+    await http.get(Uri.parse(alarmUrl), headers: {
+      "Access-Control_Allow_Origin": "*",
+      "Access-Control_Allow_Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
+    }).then((Response) {
       if (Response.statusCode == 200) {
         print('알람ok');
       } else {}
@@ -230,8 +243,10 @@ class SmartPlug extends GetxController {
 
   turn_on(String user_id) async {
     String onUrl = "http://43.200.68.231:51213/on?ip=${ip}&user_id=${user_id}";
-    await http.get(Uri.parse(onUrl),
-        headers: {"Access-Control_Allow_Origin": "*"}).then((Response) {
+    await http.get(Uri.parse(onUrl), headers: {
+      "Access-Control_Allow_Origin": "*",
+      "Access-Control_Allow_Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
+    }).then((Response) {
       Response.statusCode == 200 ? onoffstate.value = true : null;
     });
   }
@@ -239,8 +254,10 @@ class SmartPlug extends GetxController {
   turn_off(String user_id) async {
     String offUrl =
         "http://43.200.68.231:51213/off?ip=${ip}&user_id=${user_id}";
-    await http.get(Uri.parse(offUrl),
-        headers: {"Access-Control_Allow_Origin": "*"}).then((Response) {
+    await http.get(Uri.parse(offUrl), headers: {
+      "Access-Control_Allow_Origin": "*",
+      "Access-Control_Allow_Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
+    }).then((Response) {
       Response.statusCode == 200 ? onoffstate.value = false : null;
     });
   }
@@ -280,8 +297,10 @@ class SmartPlug extends GetxController {
   rule_base_off(String user_id) async {
     String rulebaseonUrl =
         "http://43.200.68.231:51213/rule_base_off?ip=${ip}&user_id=${user_id}";
-    await http.get(Uri.parse(rulebaseonUrl),
-        headers: {"Access-Control_Allow_Origin": "*"}).then((Response) {
+    await http.get(Uri.parse(rulebaseonUrl), headers: {
+      "Access-Control_Allow_Origin": "*",
+      "Access-Control_Allow_Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
+    }).then((Response) {
       Response.statusCode == 200 ? rulebasestate.value = 0 : null;
     });
 
@@ -291,8 +310,10 @@ class SmartPlug extends GetxController {
   rule_base_on2(String user_id) async {
     String rulebaseonUrl2 =
         "http://43.200.68.231:51213/rule_base_on2?ip=${ip}&user_id=${user_id}";
-    await http.get(Uri.parse(rulebaseonUrl2),
-        headers: {"Access-Control_Allow_Origin": "*"}).then((Response) {
+    await http.get(Uri.parse(rulebaseonUrl2), headers: {
+      "Access-Control_Allow_Origin": "*",
+      "Access-Control_Allow_Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
+    }).then((Response) {
       Response.statusCode == 200 ? print('ok루프시작') : null;
     });
   }
@@ -306,7 +327,7 @@ class LoginController extends GetxController {
     while (i < 100) {
       i++;
       op.value = i / 100;
-      sleep(const Duration(milliseconds: 10));
+      // sleep(const Duration(milliseconds: 10));
     }
     login_index.value = 1;
     print(login_index.value);

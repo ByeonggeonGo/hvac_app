@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'Controllers.dart';
 import 'package:flutter_neumorphic_null_safety/flutter_neumorphic.dart';
 // import 'package:bezier_chart/bezier_chart.dart';
-import 'dart:io';
+// import 'dart:io';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -35,7 +35,7 @@ void main() async {
   plugcontroller.set_plug_list(user_id);
   plugcontroller.load_data();
 
-  var path = Directory.current.path;
+  // var path = Directory.current.path;
   // Hive..init(path);
   await Hive.initFlutter();
   Box bbox = await Hive.openBox('alarm_db');
@@ -954,7 +954,7 @@ class Mainhome extends StatelessWidget {
                                         await plugcontroller
                                             .pluglist.value[index]
                                             .rule_base_on(user_id);
-                                        sleep(Duration(seconds: 1));
+                                        // sleep(Duration(seconds: 1));
                                         await plugcontroller
                                             .pluglist.value[index]
                                             .rule_base_on2(user_id);
@@ -1220,8 +1220,8 @@ class Mainhome extends StatelessWidget {
                                                                       user_id,
                                                                       ip_t,
                                                                       name_t);
-                                                              sleep(Duration(
-                                                                  seconds: 1));
+                                                              // sleep(Duration(
+                                                              //     seconds: 1));
                                                               await plugcontroller
                                                                   .add_plug(
                                                                       user_id,
@@ -1230,8 +1230,8 @@ class Mainhome extends StatelessWidget {
                                                                       sensornum_t,
                                                                       typeagent_t,
                                                                       ruleset_t);
-                                                              sleep(Duration(
-                                                                  seconds: 1));
+                                                              // sleep(Duration(
+                                                              //     seconds: 1));
                                                               plugcontroller
                                                                   .set_plug_list(
                                                                       user_id);
