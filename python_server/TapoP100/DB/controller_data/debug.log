@@ -1,0 +1,116 @@
+WARNING:werkzeug: * Running on all addresses.
+   WARNING: This is a development server. Do not use it in a production deployment.
+INFO:werkzeug: * Running on http://192.168.10.30:51213/ (Press CTRL+C to quit)
+INFO:root:1
+INFO:werkzeug:192.168.10.30 - - [13/Apr/2023 15:05:01] "GET /road_plug?user_id=ehrnc HTTP/1.1" 200 -
+INFO:root:2
+INFO:werkzeug:192.168.10.30 - - [13/Apr/2023 15:05:03] "GET /mean_data HTTP/1.1" 200 -
+INFO:root:플러그 제거 성공
+INFO:werkzeug:192.168.10.30 - - [13/Apr/2023 15:19:12] "GET /remove_plug?ip=221.151.78.120:82&user_id=ehrnc&plug_name=환풍기 HTTP/1.1" 200 -
+INFO:root:플러그 제거 성공
+INFO:werkzeug:192.168.10.30 - - [13/Apr/2023 15:19:16] "GET /remove_plug?ip=221.151.78.120:81&user_id=ehrnc&plug_name=공기청정기 HTTP/1.1" 200 -
+INFO:root:CHECK!!!
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.0.24:80
+DEBUG:urllib3.connectionpool:http://192.168.0.24:80 "POST /app HTTP/1.1" 200 208
+DEBUG:urllib3.connectionpool:Resetting dropped connection: 192.168.0.24
+DEBUG:urllib3.connectionpool:http://192.168.0.24:80 "POST /app HTTP/1.1" 200 149
+DEBUG:urllib3.connectionpool:Resetting dropped connection: 192.168.0.24
+DEBUG:urllib3.connectionpool:http://192.168.0.24:80 "POST /app?token=31E2EBE44D84288773B7C9B66CA631A6 HTTP/1.1" 200 1089
+INFO:root:{'ip': '192.168.0.24', 'user_id': 'ehrnc', 'plug_name': 'ttt1', 'on_state': False, 'rulebase': 0, 'ruleset': '1000', 'sensornum': '1', 'type_agent': 'V', 'schedule': 0}
+INFO:root:플러그추가 성공
+INFO:werkzeug:192.168.10.30 - - [13/Apr/2023 15:19:59] "GET /add_plug?ip=192.168.0.24&user_id=ehrnc&plug_name=ttt1&sensornum=1&type_agent=V&ruleset=1000 HTTP/1.1" 200 -
+INFO:werkzeug:192.168.10.30 - - [13/Apr/2023 15:19:59] "GET /road_plug?user_id=ehrnc HTTP/1.1" 200 -
+INFO:root:CHECK!!!
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.0.24:80
+DEBUG:urllib3.connectionpool:http://192.168.0.24:80 "POST /app HTTP/1.1" 200 208
+DEBUG:urllib3.connectionpool:Resetting dropped connection: 192.168.0.24
+DEBUG:urllib3.connectionpool:http://192.168.0.24:80 "POST /app HTTP/1.1" 200 149
+DEBUG:urllib3.connectionpool:Resetting dropped connection: 192.168.0.24
+DEBUG:urllib3.connectionpool:http://192.168.0.24:80 "POST /app?token=2ED503D1D291CC932CB32BB25BA250A2 HTTP/1.1" 200 1089
+INFO:root:{'ip': '192.168.0.24', 'user_id': 'ehrnc', 'plug_name': 'ttt2', 'on_state': False, 'rulebase': 0, 'ruleset': '25', 'sensornum': '2', 'type_agent': 'A', 'schedule': 0}
+INFO:root:중복
+INFO:werkzeug:192.168.10.30 - - [13/Apr/2023 15:20:23] "GET /add_plug?ip=192.168.0.24&user_id=ehrnc&plug_name=ttt2&sensornum=2&type_agent=A&ruleset=25 HTTP/1.1" 200 -
+INFO:werkzeug:192.168.10.30 - - [13/Apr/2023 15:20:23] "GET /road_plug?user_id=ehrnc HTTP/1.1" 200 -
+INFO:root:플러그 제거 성공
+INFO:werkzeug:192.168.10.30 - - [13/Apr/2023 15:20:40] "GET /remove_plug?ip=&user_id=ehrnc&plug_name= HTTP/1.1" 200 -
+INFO:root:CHECK!!!
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.0.25:80
+DEBUG:urllib3.connectionpool:http://192.168.0.25:80 "POST /app HTTP/1.1" 200 208
+DEBUG:urllib3.connectionpool:Resetting dropped connection: 192.168.0.25
+DEBUG:urllib3.connectionpool:http://192.168.0.25:80 "POST /app HTTP/1.1" 200 149
+DEBUG:urllib3.connectionpool:Resetting dropped connection: 192.168.0.25
+DEBUG:urllib3.connectionpool:http://192.168.0.25:80 "POST /app?token=4DDBF0D625067B00916036634B539052 HTTP/1.1" 200 1089
+INFO:root:{'ip': '192.168.0.25', 'user_id': 'ehrnc', 'plug_name': 'ttt2', 'on_state': False, 'rulebase': 0, 'ruleset': '35', 'sensornum': '2', 'type_agent': 'A', 'schedule': 0}
+INFO:root:플러그추가 성공
+INFO:werkzeug:192.168.10.30 - - [13/Apr/2023 15:21:02] "GET /add_plug?ip=192.168.0.25&user_id=ehrnc&plug_name=ttt2&sensornum=2&type_agent=A&ruleset=35 HTTP/1.1" 200 -
+INFO:werkzeug:192.168.10.30 - - [13/Apr/2023 15:21:02] "GET /road_plug?user_id=ehrnc HTTP/1.1" 200 -
+INFO:werkzeug:192.168.10.30 - - [13/Apr/2023 15:21:06] "GET /rule_base_on?ip=192.168.0.24&user_id=ehrnc HTTP/1.1" 200 -
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.0.24:80
+DEBUG:urllib3.connectionpool:http://192.168.0.24:80 "POST /app HTTP/1.1" 200 208
+DEBUG:urllib3.connectionpool:Resetting dropped connection: 192.168.0.24
+DEBUG:urllib3.connectionpool:http://192.168.0.24:80 "POST /app HTTP/1.1" 200 149
+DEBUG:urllib3.connectionpool:Resetting dropped connection: 192.168.0.24
+DEBUG:urllib3.connectionpool:http://192.168.0.24:80 "POST /app?token=5D7AE97FA42F7E2DD80DBD0CE61C5C1C HTTP/1.1" 200 85
+INFO:root:{'time': '2023-04-13 15:21:07', 'ip': '192.168.0.24', 'state': 'rulebase_on', 'val': 1398.22}
+INFO:werkzeug:192.168.10.30 - - [13/Apr/2023 15:21:09] "GET /rule_base_on?ip=192.168.0.25&user_id=ehrnc HTTP/1.1" 200 -
+INFO:root:{'time': '2023-04-13 15:21:09', 'ip': '192.168.0.25', 'state': 'rulebase_on', 'val': 2.565}
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.0.25:80
+DEBUG:urllib3.connectionpool:http://192.168.0.25:80 "POST /app HTTP/1.1" 200 208
+DEBUG:urllib3.connectionpool:Resetting dropped connection: 192.168.0.25
+DEBUG:urllib3.connectionpool:http://192.168.0.25:80 "POST /app HTTP/1.1" 200 149
+DEBUG:urllib3.connectionpool:Resetting dropped connection: 192.168.0.25
+DEBUG:urllib3.connectionpool:http://192.168.0.25:80 "POST /app?token=2772137E52BE48B8E8D8EDDBB5EB37EA HTTP/1.1" 200 85
+INFO:werkzeug:192.168.10.30 - - [13/Apr/2023 15:21:12] "GET /on?ip=192.168.0.25&user_id=ehrnc HTTP/1.1" 200 -
+INFO:root:{'time': '2023-04-13 15:21:17', 'ip': '192.168.0.24', 'state': 'rulebase_on', 'val': 1395.675}
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.0.25:80
+DEBUG:urllib3.connectionpool:http://192.168.0.25:80 "POST /app HTTP/1.1" 200 208
+DEBUG:urllib3.connectionpool:Resetting dropped connection: 192.168.0.25
+DEBUG:urllib3.connectionpool:http://192.168.0.25:80 "POST /app HTTP/1.1" 200 149
+DEBUG:urllib3.connectionpool:Resetting dropped connection: 192.168.0.25
+DEBUG:urllib3.connectionpool:http://192.168.0.25:80 "POST /app?token=41914895D8D5DCD79CF79EF6BEE6B7E6 HTTP/1.1" 200 85
+INFO:root:{'time': '2023-04-13 15:21:20', 'ip': '192.168.0.25', 'state': 'rulebase_on', 'val': 1.955}
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.0.24:80
+DEBUG:urllib3.connectionpool:http://192.168.0.24:80 "POST /app HTTP/1.1" 200 208
+DEBUG:urllib3.connectionpool:Resetting dropped connection: 192.168.0.24
+DEBUG:urllib3.connectionpool:http://192.168.0.24:80 "POST /app HTTP/1.1" 200 149
+DEBUG:urllib3.connectionpool:Resetting dropped connection: 192.168.0.24
+DEBUG:urllib3.connectionpool:http://192.168.0.24:80 "POST /app?token=B61E4E1CC93CBD3DF62D4C2DE92DB42D HTTP/1.1" 200 85
+INFO:werkzeug:192.168.10.30 - - [13/Apr/2023 15:21:23] "GET /off?ip=192.168.0.24&user_id=ehrnc HTTP/1.1" 200 -
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.0.24:80
+DEBUG:urllib3.connectionpool:http://192.168.0.24:80 "POST /app HTTP/1.1" 200 208
+DEBUG:urllib3.connectionpool:Resetting dropped connection: 192.168.0.24
+DEBUG:urllib3.connectionpool:http://192.168.0.24:80 "POST /app HTTP/1.1" 200 149
+DEBUG:urllib3.connectionpool:Resetting dropped connection: 192.168.0.24
+DEBUG:urllib3.connectionpool:http://192.168.0.24:80 "POST /app?token=FA7A6C7C081C431FF92F542E893E573E HTTP/1.1" 200 85
+INFO:root:{'time': '2023-04-13 15:21:28', 'ip': '192.168.0.24', 'state': 'rulebase_on', 'val': 1392.575}
+INFO:root:{'time': '2023-04-13 15:21:30', 'ip': '192.168.0.25', 'state': 'rulebase_on', 'val': 1.955}
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.0.25:80
+DEBUG:urllib3.connectionpool:http://192.168.0.25:80 "POST /app HTTP/1.1" 200 208
+DEBUG:urllib3.connectionpool:Resetting dropped connection: 192.168.0.25
+DEBUG:urllib3.connectionpool:http://192.168.0.25:80 "POST /app HTTP/1.1" 200 149
+DEBUG:urllib3.connectionpool:Resetting dropped connection: 192.168.0.25
+DEBUG:urllib3.connectionpool:http://192.168.0.25:80 "POST /app?token=DC70647DE9AD3DAB73CB91C8BEF84FF9 HTTP/1.1" 200 85
+INFO:werkzeug:192.168.10.30 - - [13/Apr/2023 15:21:30] "GET /on?ip=192.168.0.25&user_id=ehrnc HTTP/1.1" 200 -
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.0.25:80
+DEBUG:urllib3.connectionpool:http://192.168.0.25:80 "POST /app HTTP/1.1" 200 208
+DEBUG:urllib3.connectionpool:Resetting dropped connection: 192.168.0.25
+DEBUG:urllib3.connectionpool:http://192.168.0.25:80 "POST /app HTTP/1.1" 200 149
+DEBUG:urllib3.connectionpool:Resetting dropped connection: 192.168.0.25
+DEBUG:urllib3.connectionpool:http://192.168.0.25:80 "POST /app?token=9ACCC6C704772A72CB22D42024002301 HTTP/1.1" 200 85
+INFO:werkzeug:192.168.10.30 - - [13/Apr/2023 15:21:36] "GET /off?ip=192.168.0.25&user_id=ehrnc HTTP/1.1" 200 -
+INFO:root:{'time': '2023-04-13 15:21:38', 'ip': '192.168.0.24', 'state': 'rulebase_on', 'val': 1385.822}
+INFO:werkzeug:192.168.10.30 - - [13/Apr/2023 15:21:38] "GET /rule_base_off?ip=192.168.0.24&user_id=ehrnc HTTP/1.1" 200 -
+INFO:werkzeug:192.168.10.30 - - [13/Apr/2023 15:21:39] "GET /rule_base_off?ip=192.168.0.25&user_id=ehrnc HTTP/1.1" 200 -
+INFO:root:rulebase_작동중지
+INFO:werkzeug:192.168.10.30 - - [13/Apr/2023 15:21:40] "GET /rule_base_on2?ip=192.168.0.25&user_id=ehrnc HTTP/1.1" 200 -
+DEBUG:urllib3.connectionpool:Starting new HTTP connection (1): 192.168.0.24:80
+DEBUG:urllib3.connectionpool:http://192.168.0.24:80 "POST /app HTTP/1.1" 200 208
+DEBUG:urllib3.connectionpool:Resetting dropped connection: 192.168.0.24
+DEBUG:urllib3.connectionpool:http://192.168.0.24:80 "POST /app HTTP/1.1" 200 149
+DEBUG:urllib3.connectionpool:Resetting dropped connection: 192.168.0.24
+DEBUG:urllib3.connectionpool:http://192.168.0.24:80 "POST /app?token=4259B95C060CF30EA42EDE2F7D3F403F HTTP/1.1" 200 85
+INFO:werkzeug:192.168.10.30 - - [13/Apr/2023 15:21:43] "GET /off?ip=192.168.0.24&user_id=ehrnc HTTP/1.1" 200 -
+INFO:root:rulebase_작동중지_yield함수
+INFO:root:rulebase_작동중지
+INFO:werkzeug:192.168.10.30 - - [13/Apr/2023 15:21:49] "GET /rule_base_on2?ip=192.168.0.24&user_id=ehrnc HTTP/1.1" 200 -
+INFO:root:rulebase_작동중지_yield함수

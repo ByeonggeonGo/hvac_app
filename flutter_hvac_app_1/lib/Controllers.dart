@@ -4,16 +4,17 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 // import 'dart:io';
 
-// 43.200.68.231
+// 192.168.10.30
+// 192.168.10.30
 class PlugController extends GetxController {
   var _pluglist = [].obs;
   RxList sensor_data = [].obs;
   Map _sensor_map = {};
   var dataset_index = 0.obs;
-  // String pub_ip = '43.200.68.231:51213';
-  // String pub_ip = '43.200.68.231:51213';
-  // 192.168.0.108:51213
-  String sensor_dataset_Url = "http://43.200.68.231:51213/mean_data";
+  // String pub_ip = '192.168.0.108:51213';
+  // String pub_ip = '192.168.10.30:51213';
+  // 192.168.10.30:51213
+  String sensor_dataset_Url = "http://192.168.10.30:51213/mean_data";
   RxList get pluglist => _pluglist;
 
   Map get sensor_map => _sensor_map;
@@ -24,7 +25,7 @@ class PlugController extends GetxController {
     // plug.name = name;
     // plug.sensornum = sensornum;
     String addUrl =
-        "http://43.200.68.231:51213/add_plug?ip=${ip}&user_id=${user_id}&plug_name=${name}&sensornum=${sensornum}&type_agent=${typeagent}&ruleset=${ruleset}";
+        "http://192.168.10.30:51213/add_plug?ip=${ip}&user_id=${user_id}&plug_name=${name}&sensornum=${sensornum}&type_agent=${typeagent}&ruleset=${ruleset}";
     print(addUrl);
     await http.get(Uri.parse(addUrl), headers: {
       "Access-Control-Allow-Origin": "*",
@@ -55,7 +56,7 @@ class PlugController extends GetxController {
 
   remove_plug(String user_id, String ip, String name) async {
     String removeUrl =
-        "http://43.200.68.231:51213/remove_plug?ip=${ip}&user_id=${user_id}&plug_name=${name}";
+        "http://192.168.10.30:51213/remove_plug?ip=${ip}&user_id=${user_id}&plug_name=${name}";
     await http.get(Uri.parse(removeUrl), headers: {
       "Access-Control_Allow_Origin": "*",
       "Access-Control_Allow_Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
@@ -87,7 +88,7 @@ class PlugController extends GetxController {
 
   set_plug_list(String user_id) async {
     String plug_list_Url =
-        "http://43.200.68.231:51213/road_plug?user_id=${user_id}";
+        "http://192.168.10.30:51213/road_plug?user_id=${user_id}";
 
     await http.get(
       Uri.parse(plug_list_Url),
@@ -216,7 +217,7 @@ class PlugController extends GetxController {
     // plug.name = name;
     // plug.sensornum = sensornum;
     String alarmUrl =
-        "http://43.200.68.231:51213/rulebase_schedule?ip=${ip}&user_id=${user_id}&start=${start}&end=${end}&state=${state}";
+        "http://192.168.10.30:51213/rulebase_schedule?ip=${ip}&user_id=${user_id}&start=${start}&end=${end}&state=${state}";
     print(alarmUrl);
     await http.get(Uri.parse(alarmUrl), headers: {
       "Access-Control_Allow_Origin": "*",
@@ -242,7 +243,7 @@ class SmartPlug extends GetxController {
   RxInt schedule = 0.obs;
 
   turn_on(String user_id) async {
-    String onUrl = "http://43.200.68.231:51213/on?ip=${ip}&user_id=${user_id}";
+    String onUrl = "http://192.168.10.30:51213/on?ip=${ip}&user_id=${user_id}";
     await http.get(Uri.parse(onUrl), headers: {
       "Access-Control_Allow_Origin": "*",
       "Access-Control_Allow_Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
@@ -253,7 +254,7 @@ class SmartPlug extends GetxController {
 
   turn_off(String user_id) async {
     String offUrl =
-        "http://43.200.68.231:51213/off?ip=${ip}&user_id=${user_id}";
+        "http://192.168.10.30:51213/off?ip=${ip}&user_id=${user_id}";
     await http.get(Uri.parse(offUrl), headers: {
       "Access-Control_Allow_Origin": "*",
       "Access-Control_Allow_Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
@@ -264,7 +265,7 @@ class SmartPlug extends GetxController {
 
   rule_base_on(String user_id) async {
     String rulebaseonUrl =
-        "http://43.200.68.231:51213/rule_base_on?ip=${ip}&user_id=${user_id}";
+        "http://192.168.10.30:51213/rule_base_on?ip=${ip}&user_id=${user_id}";
 
     var request = http.Request(
       'GET',
@@ -292,11 +293,11 @@ class SmartPlug extends GetxController {
           ? onoffstate.value = true
           : onoffstate.value = false;
     });
-  } // # http://43.200.68.231:51213/rule_base_on?ip=192.168.0.118&user_id=ehrnc
+  } // # http://192.168.10.30:51213/rule_base_on?ip=192.168.0.118&user_id=ehrnc
 
   rule_base_off(String user_id) async {
     String rulebaseonUrl =
-        "http://43.200.68.231:51213/rule_base_off?ip=${ip}&user_id=${user_id}";
+        "http://192.168.10.30:51213/rule_base_off?ip=${ip}&user_id=${user_id}";
     await http.get(Uri.parse(rulebaseonUrl), headers: {
       "Access-Control_Allow_Origin": "*",
       "Access-Control_Allow_Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
@@ -304,12 +305,12 @@ class SmartPlug extends GetxController {
       Response.statusCode == 200 ? rulebasestate.value = 0 : null;
     });
 
-    // http://43.200.68.231:51213/rule_base_off?ip=192.168.0.118&user_id=ehrnc
+    // http://192.168.10.30:51213/rule_base_off?ip=192.168.0.118&user_id=ehrnc
   }
 
   rule_base_on2(String user_id) async {
     String rulebaseonUrl2 =
-        "http://43.200.68.231:51213/rule_base_on2?ip=${ip}&user_id=${user_id}";
+        "http://192.168.10.30:51213/rule_base_on2?ip=${ip}&user_id=${user_id}";
     await http.get(Uri.parse(rulebaseonUrl2), headers: {
       "Access-Control_Allow_Origin": "*",
       "Access-Control_Allow_Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
